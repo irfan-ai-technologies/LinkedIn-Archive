@@ -111,7 +111,7 @@ def serve(
     config = _load(config_path)
     if not no_build:
         build_site(config)
-    serve_directory(config.dist_dir, host=host, port=port)
+    serve_directory(config.dist_dir, host=host, port=port, base_path=config.base_path)
 
 
 @app.command()
