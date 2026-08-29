@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import urlparse
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
@@ -164,6 +165,26 @@ class AppConfig(BaseModel):
     @property
     def site_url(self) -> str:
         return (self.secrets.linkedin_archive_site_url or self.user.site.url).rstrip("/")
+
+    @property
+    def site_origin(self) -> str:
+        """Scheme + host only, no path — for combining with paths that already
+        include :attr:`base_path` (everything the ``app.site.urls`` helpers
+        return). Combining those with :attr:`site_url` instead would double
+        up the base path."""
+        parsed = urlparse(self.site_url)
+        return f"{parsed.scheme}://{parsed.netloc}"
+
+    @property
+    def base_path(self) -> str:
+        """URL path prefix the site is served under, e.g. ``/LinkedIn-Archive``.
+
+        Derived from ``site_url`` so a GitHub Pages project site (served from
+        ``https://<you>.github.io/<repo>/`` rather than the domain root) gets
+        every internal link and static asset path prefixed correctly. Empty
+        for a root deployment (custom domain, or a ``<you>.github.io`` repo).
+        """
+        return urlparse(self.site_url).path.rstrip("/")
 
 
 def load_config(

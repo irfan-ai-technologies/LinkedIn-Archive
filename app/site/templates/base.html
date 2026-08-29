@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ site.title }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
-  <link rel="canonical" href="{{ config.site_url }}{{ canonical_path|default('/') }}">
+  <link rel="canonical" href="{{ config.site_origin }}{{ canonical_path|default('/') }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ feed_url() }}">
   <link rel="sitemap" type="application/xml" href="{{ sitemap_url() }}">
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="{{ static_url('css/style.css') }}">
   <meta name="theme-color" content="{{ theme.accent_color }}">
   {% block og %}
   {% for key, value in open_graph(title=self.title()|trim, description=site.description, url=canonical_path|default('/'), config=config).items() %}
@@ -52,8 +52,8 @@
       </p>
     </div>
   </footer>
-  <script src="/static/js/theme.js" defer></script>
-  <script src="/static/js/nav.js" defer></script>
+  <script src="{{ static_url('js/theme.js') }}" defer></script>
+  <script src="{{ static_url('js/nav.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

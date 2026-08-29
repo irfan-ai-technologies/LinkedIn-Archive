@@ -12,12 +12,12 @@ from xml.sax.saxutils import escape
 from app.config import AppConfig
 from app.models.post import Post
 from app.site.render import render_markdown
-from app.site.urls import feed_url, post_url
+from app.site.urls import feed_url, home_url, post_url, sitemap_url
 
 
 def generate_rss(posts: list[Post], config: AppConfig, *, max_items: int = 30) -> str:
     site = config.user.site
-    base_url = config.site_url
+    base_url = config.site_origin
     items = []
     for post in posts[:max_items]:
         link = f"{base_url}{post_url(post.id)}"
@@ -39,7 +39,7 @@ def generate_rss(posts: list[Post], config: AppConfig, *, max_items: int = 30) -
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
         "  <channel>\n"
         f"    <title>{escape(site.title)}</title>\n"
-        f"    <link>{escape(base_url)}/</link>\n"
+        f"    <link>{escape(base_url + home_url())}</link>\n"
         f"    <description>{escape(site.description)}</description>\n"
         f"    <language>{escape(site.language)}</language>\n"
         f'    <atom:link href="{escape(base_url)}{feed_url()}" rel="self" '
@@ -59,7 +59,7 @@ class SitemapEntry:
 
 
 def generate_sitemap(entries: list[SitemapEntry], config: AppConfig) -> str:
-    base_url = config.site_url
+    base_url = config.site_origin
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -77,5 +77,4 @@ def generate_sitemap(entries: list[SitemapEntry], config: AppConfig) -> str:
 
 
 def generate_robots_txt(config: AppConfig) -> str:
-    base_url = config.site_url
-    return f"User-agent: *\nAllow: /\n\nSitemap: {base_url}/sitemap.xml\n"
+    return f"User-agent: *\nAllow: /\n\nSitemap: {config.site_origin}{sitemap_url()}\n"
