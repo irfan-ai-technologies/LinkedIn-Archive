@@ -39,9 +39,11 @@ from app.site.urls import (
     search_index_url,
     search_url,
     sitemap_url,
+    static_url,
     tag_index_url,
     tag_url,
 )
+from app.site.urls import configure as configure_urls
 from app.storage.profile_store import load_profile
 from app.storage.store import PostStore
 
@@ -69,6 +71,7 @@ class SiteGenerator:
 
     def __init__(self, config: AppConfig) -> None:
         self.config = config
+        configure_urls(config.base_path)
         self.store = PostStore(config.posts_dir)
         self.env = self._build_environment()
 
@@ -101,6 +104,7 @@ class SiteGenerator:
                 "feed_url": feed_url,
                 "sitemap_url": sitemap_url,
                 "search_index_url": search_index_url,
+                "static_url": static_url,
                 "open_graph": open_graph,
                 "post_json_ld": post_json_ld,
                 "website_json_ld": website_json_ld,
@@ -376,7 +380,9 @@ class SiteGenerator:
 
     def _write_404(self) -> None:
         self._render(
-            "pages/404.html", self.config.dist_dir / "404.html", canonical_path="/404.html"
+            "pages/404.html",
+            self.config.dist_dir / "404.html",
+            canonical_path=f"{self.config.base_path}/404.html",
         )
 
     def _write_feeds(self, posts: list[Post]) -> None:

@@ -8,7 +8,7 @@ from app.site.urls import post_url
 
 
 def post_json_ld(post: Post, config: AppConfig) -> dict[str, object]:
-    base_url = config.site_url
+    base_url = config.site_origin
     data: dict[str, object] = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -48,7 +48,7 @@ def open_graph(
         "og:type": og_type,
         "og:title": title,
         "og:description": description,
-        "og:url": f"{config.site_url}{url}",
+        "og:url": f"{config.site_origin}{url}",
         "twitter:card": "summary",
         "twitter:title": title,
         "twitter:description": description,

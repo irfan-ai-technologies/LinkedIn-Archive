@@ -13,7 +13,7 @@ site:
   author: "Your Name"
   # Public base URL of the deployed site, no trailing slash.
   # Used to build canonical URLs, the sitemap, and the RSS feed.
-  url: "https://example.github.io/linkedin-archive"
+  url: "https://irfan-ai-technologies.github.io/LinkedIn-Archive"
   linkedin_url: "https://www.linkedin.com/in/example"
   language: "en"
   timezone: "UTC"
