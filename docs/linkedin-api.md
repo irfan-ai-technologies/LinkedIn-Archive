@@ -71,4 +71,7 @@ All of the above — endpoints, request/response shapes, API version headers —
 - Ask for or store your LinkedIn password.
 - Attempt to bypass LinkedIn's restricted-product approval process.
 
-If you need posts sooner than LinkedIn's approval process allows, use `linkedin-archive import posts.json` — see [`providers.md`](providers.md).
+If you need posts sooner than LinkedIn's approval process allows — or if it never comes through,
+since LinkedIn is not currently accepting new `r_member_social` access requests at all — use
+`linkedin-archive import-export <unzipped export dir>` against LinkedIn's own "Download my data"
+export, or hand-write `linkedin-archive import posts.json`. See [`providers.md`](providers.md).
