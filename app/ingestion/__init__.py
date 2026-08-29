@@ -12,11 +12,13 @@ from pathlib import Path
 from app.config import AppConfig
 from app.ingestion.base import ContentProvider, ProviderError
 from app.ingestion.json_import import JsonImportProvider
+from app.ingestion.linkedin_export import LinkedInExportProvider
 from app.ingestion.sample import SampleProvider
 
 __all__ = [
     "ContentProvider",
     "JsonImportProvider",
+    "LinkedInExportProvider",
     "ProviderError",
     "SampleProvider",
     "get_provider",
@@ -50,8 +52,18 @@ def get_provider(name: str, config: AppConfig) -> ContentProvider:
             "import",
             "the import provider requires a file path; use `linkedin-archive import <file>`",
         )
+    if name == "linkedin_export":
+        raise ProviderError(
+            "linkedin_export",
+            "the linkedin_export provider requires an export directory; "
+            "use `linkedin-archive import-export <dir>`",
+        )
     raise ProviderError(name, f"unknown provider: {name!r}")
 
 
 def import_provider(path: Path | str, default_author: str) -> JsonImportProvider:
     return JsonImportProvider(path, default_author=default_author)
+
+
+def linkedin_export_provider(path: Path | str, default_author: str) -> LinkedInExportProvider:
+    return LinkedInExportProvider(path, default_author=default_author)

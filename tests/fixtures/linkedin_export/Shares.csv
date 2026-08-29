@@ -1,0 +1,7 @@
+Date,ShareLink,ShareCommentary,SharedUrl,MediaUrl,Visibility
+2026-01-15 10:00:00,https://www.linkedin.com/posts/janedoe_agenticai-activity-7150000000000000001-AbCd,"Excited to share some thoughts on #AgenticAI systems in production. Check https://example.com/blog for more.",,,PUBLIC
+2026-02-10 09:30:00,https://www.linkedin.com/posts/janedoe_activity-7150000000000000002-WxYz,Sharing an interesting read on engineering leadership.,https://example.com/leadership-article,,PUBLIC
+2026-03-05 14:00:00,https://www.linkedin.com/posts/janedoe_activity-7150000000000000003-QrSt,A snapshot from our latest sprint demo.,,https://media.example.com/photo.jpg,PUBLIC
+2026-03-10 08:00:00,https://www.linkedin.com/posts/janedoe_activity-7150000000000000004-UvWx,,,,PUBLIC
+not-a-date,https://www.linkedin.com/posts/janedoe_activity-7150000000000000005-YzAb,This one has a broken date.,,,PUBLIC
+2026-04-01 12:00:00,,"No link on this one, but real content.",,,PUBLIC
