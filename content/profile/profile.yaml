@@ -1,0 +1,26 @@
+# =============================================================================
+# LinkedIn Archive — profile
+# =============================================================================
+# Rendered on the home page and the About page. Edit freely; this file
+# contains no secrets and no application code.
+# =============================================================================
+
+name: "Jordan Rivera"
+headline: "Software architect writing about agentic AI, engineering, and leadership."
+location: "Remote"
+
+bio: |
+  I write about the practical side of building software with AI: agentic
+  systems in production, the engineering habits that scale teams, and the
+  leadership lessons that don't show up in a job title.
+
+  This archive mirrors what I post on LinkedIn — normalized, organized, and
+  fully searchable, without needing to scroll a feed to find it again.
+
+avatar: null
+
+links:
+  linkedin: "https://www.linkedin.com/in/example"
+  github: "https://github.com/example"
+  website: ""
+  email: ""

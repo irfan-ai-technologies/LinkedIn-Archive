@@ -1,0 +1,121 @@
+# =============================================================================
+# LinkedIn Archive — USER CONFIGURATION
+# =============================================================================
+# This is the only file most fork owners need to edit. It contains no secrets
+# (those go in environment variables / GitHub Secrets — see .env.example) and
+# no application code. Everything here can be changed without touching
+# anything under app/.
+# =============================================================================
+
+site:
+  title: "My LinkedIn Archive"
+  description: "A searchable archive of my LinkedIn posts and ideas."
+  author: "Your Name"
+  # Public base URL of the deployed site, no trailing slash.
+  # Used to build canonical URLs, the sitemap, and the RSS feed.
+  url: "https://example.github.io/linkedin-archive"
+  linkedin_url: "https://www.linkedin.com/in/example"
+  language: "en"
+  timezone: "UTC"
+  # Optional social/profile links shown in the site footer.
+  links:
+    github: ""
+    website: ""
+    email: ""
+
+theme:
+  # "auto" respects the visitor's OS preference; "light" / "dark" force a mode.
+  default_mode: "auto"
+  accent_color: "#0a66c2"
+  posts_per_page: 12
+  featured_count: 3
+  recent_count: 6
+  show_reading_time: true
+  show_word_count: false
+
+sync:
+  enabled: true
+  # Which provider to use for `linkedin-archive sync`. One of:
+  #   linkedin | sample
+  # `import` is always available via `linkedin-archive import <file>` and does
+  # not go through this setting.
+  provider: "sample"
+  # How far back to look on the very first sync (ISO-8601 duration or date).
+  initial_lookback_days: 365
+  # If true, posts that disappear from the source are kept in the archive.
+  preserve_deleted: true
+
+search:
+  # Maximum number of characters of body text kept per post in the client
+  # search index, to keep the index small on large archives.
+  max_indexed_chars: 4000
+
+pagination:
+  posts_per_page: 12
+  archive_per_page: 50
+
+# =============================================================================
+# Categories
+# =============================================================================
+# Fully customizable. Each post is assigned exactly one primary category
+# (the first matching category, in priority order — lower number = higher
+# priority) plus any number of tags derived from hashtags and keywords.
+# =============================================================================
+categories:
+  - name: "Artificial Intelligence"
+    slug: "artificial-intelligence"
+    description: "AI, machine learning, and intelligent systems."
+    priority: 10
+    keywords:
+      - "artificial intelligence"
+      - "machine learning"
+      - " ai "
+      - "deep learning"
+      - "neural network"
+
+  - name: "Agentic AI"
+    slug: "agentic-ai"
+    description: "AI agents, autonomous systems, and agentic workflows."
+    priority: 5
+    keywords:
+      - "agentic"
+      - "ai agent"
+      - "autonomous agent"
+      - "multi-agent"
+      - "mcp"
+
+  - name: "Software Engineering"
+    slug: "software-engineering"
+    description: "Engineering practice, architecture, and system design."
+    priority: 20
+    keywords:
+      - "architecture"
+      - "software engineering"
+      - "system design"
+      - "engineering"
+
+  - name: "Leadership"
+    slug: "leadership"
+    description: "Management, mentorship, and team leadership."
+    priority: 30
+    keywords:
+      - "leadership"
+      - "management"
+      - "mentorship"
+      - "team building"
+
+  - name: "Career"
+    slug: "career"
+    description: "Career growth, learning, and professional development."
+    priority: 40
+    keywords:
+      - "career"
+      - "job search"
+      - "interview"
+      - "professional development"
+
+  - name: "General"
+    slug: "general"
+    description: "Everything else."
+    priority: 1000
+    keywords: []

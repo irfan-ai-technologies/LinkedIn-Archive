@@ -216,3 +216,27 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# =============================================================================
+# LinkedIn Archive project-specific
+# =============================================================================
+
+# Generated static site output (built by `linkedin-archive build`)
+/dist/
+
+# Local secrets / OAuth token storage — never commit these
+.secrets/
+*.token.json
+linkedin_token.json
+
+# Raw provider dumps (may contain full raw API payloads)
+/data/raw/*
+!/data/raw/.gitkeep
+
+# Generated search index (rebuilt on every build)
+/app/site/generated/
+
+# uv / venv
+.venv/
+uv.lock.bak
+

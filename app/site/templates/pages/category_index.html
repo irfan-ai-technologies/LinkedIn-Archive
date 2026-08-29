@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Categories · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header"><h1>Categories</h1></div>
+<div class="tag-cloud">
+  {% for category in categories %}
+  <a class="chip chip-lg" href="{{ category_url(category.slug) }}">{{ category.name }} <span class="chip-count">{{ category.count }}</span></a>
+  {% endfor %}
+</div>
+{% endblock %}

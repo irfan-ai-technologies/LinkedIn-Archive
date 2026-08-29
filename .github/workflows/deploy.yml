@@ -1,0 +1,71 @@
+name: Deploy site
+
+# Builds the static site with `linkedin-archive build` and publishes dist/
+# to GitHub Pages. dist/ is never committed to the repository (see
+# docs/architecture.md) — it only ever exists as this workflow's build
+# artifact, rebuilt fresh from content/ and config.yaml on every run.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+      - "static/**"
+      - "app/site/**"
+      - "config.yaml"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Validate content
+        run: uv run linkedin-archive validate
+
+      - name: Build site
+        env:
+          # Overrides site.url from config.yaml if set — useful when the
+          # Pages URL differs from what's checked into config.yaml (e.g. a
+          # custom domain configured only via the repo's Pages settings).
+          LINKEDIN_ARCHIVE_SITE_URL: ${{ vars.SITE_URL }}
+        run: uv run linkedin-archive build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

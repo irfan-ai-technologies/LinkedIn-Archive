@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "partials/post_card.html" as cards %}
+{% import "partials/pagination.html" as pag %}
+{% block title %}#{{ tag_slug }} · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header">
+  <h1>#{{ tag_slug }}</h1>
+  <p>{{ total_count }} post{{ 's' if total_count != 1 }}</p>
+</div>
+<div class="post-grid">
+  {% for post in page.items %}{{ cards.post_card(post) }}{% endfor %}
+</div>
+{{ pag.pagination_nav(page, url_for_page) }}
+{% endblock %}

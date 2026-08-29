@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}About · {{ site.title }}{% endblock %}
+{% block description %}{{ profile.bio or site.description }}{% endblock %}
+{% block content %}
+<article class="about-page">
+  {% if profile.avatar %}<img class="hero-avatar" src="{{ profile.avatar }}" alt="{{ profile.name }}" width="120" height="120" loading="lazy">{% endif %}
+  <h1>{{ profile.name }}</h1>
+  {% if profile.headline %}<p class="hero-headline">{{ profile.headline }}</p>{% endif %}
+  {% if profile.location %}<p class="about-location">{{ profile.location }}</p>{% endif %}
+  <div class="prose">{{ profile.bio_html|safe }}</div>
+  <div class="hero-actions">
+    {% if site.linkedin_url %}<a class="btn btn-primary" href="{{ site.linkedin_url }}" rel="noopener noreferrer" target="_blank">LinkedIn</a>{% endif %}
+    {% if profile.links.github %}<a class="btn" href="{{ profile.links.github }}" rel="noopener noreferrer" target="_blank">GitHub</a>{% endif %}
+    {% if profile.links.website %}<a class="btn" href="{{ profile.links.website }}" rel="noopener noreferrer" target="_blank">Website</a>{% endif %}
+    {% if profile.links.email %}<a class="btn" href="mailto:{{ profile.links.email }}">Email</a>{% endif %}
+  </div>
+</article>
+{% endblock %}

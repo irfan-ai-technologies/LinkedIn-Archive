@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "partials/post_card.html" as cards %}
+{% block title %}{{ site.title }}{% endblock %}
+{% block content %}
+<section class="hero">
+  {% if profile.avatar %}<img class="hero-avatar" src="{{ profile.avatar }}" alt="{{ profile.name }}" width="96" height="96" loading="lazy">{% endif %}
+  <h1>{{ profile.name }}</h1>
+  {% if profile.headline %}<p class="hero-headline">{{ profile.headline }}</p>{% endif %}
+  {% if profile.bio %}<p class="hero-bio">{{ profile.bio }}</p>{% endif %}
+  <div class="hero-actions">
+    {% if site.linkedin_url %}<a class="btn btn-primary" href="{{ site.linkedin_url }}" rel="noopener noreferrer" target="_blank">View on LinkedIn</a>{% endif %}
+    <a class="btn" href="{{ archive_index_url() }}">Browse the archive</a>
+    <a class="btn" href="{{ search_url() }}">Search posts</a>
+  </div>
+</section>
+
+{% if featured_posts %}
+<section aria-labelledby="featured-heading">
+  <div class="section-header">
+    <h2 id="featured-heading">Featured</h2>
+  </div>
+  <div class="post-grid">
+    {% for post in featured_posts %}{{ cards.post_card(post) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section aria-labelledby="recent-heading">
+  <div class="section-header">
+    <h2 id="recent-heading">Recent posts</h2>
+    <a href="{{ posts_index_url() }}">View all &rarr;</a>
+  </div>
+  <div class="post-grid">
+    {% for post in recent_posts %}{{ cards.post_card(post) }}{% endfor %}
+  </div>
+</section>
+
+<section aria-labelledby="categories-heading">
+  <div class="section-header">
+    <h2 id="categories-heading">Browse by category</h2>
+  </div>
+  <div class="tag-cloud">
+    {% for category in categories %}
+    <a class="chip chip-lg" href="{{ category_url(category.slug) }}">{{ category.name }} <span class="chip-count">{{ category.count }}</span></a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if popular_tags %}
+<section aria-labelledby="tags-heading">
+  <div class="section-header">
+    <h2 id="tags-heading">Popular tags</h2>
+    <a href="{{ tag_index_url() }}">All tags &rarr;</a>
+  </div>
+  <div class="tag-cloud">
+    {% for tag in popular_tags %}
+    <a class="chip" href="{{ tag_url(tag.slug) }}">#{{ tag.slug }} <span class="chip-count">{{ tag.count }}</span></a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

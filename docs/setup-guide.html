@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn Archive — Setup Guide</title>
+<style>
+  :root {
+    --accent: #0a66c2;
+    --bg: #ffffff;
+    --bg-subtle: #f5f6f8;
+    --text: #1a1a1a;
+    --text-muted: #5b6470;
+    --border: #e2e5ea;
+    --code-bg: #0f1115;
+    --code-text: #eaecef;
+    --warn-bg: #fff8e6;
+    --warn-border: #e8b93a;
+    --ok-bg: #eefaf1;
+    --ok-border: #2fa860;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+  header.page-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  header.page-header p.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+  header.page-header h1 { margin: 0 0 0.5rem; font-size: 2.1rem; }
+  header.page-header p.lede { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; margin: 0; }
+
+  nav.toc {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  nav.toc h2 { margin: 0 0 0.6rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+  nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; }
+  nav.toc li { margin-bottom: 0.35rem; break-inside: avoid; }
+  nav.toc a { color: var(--text); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+
+  section.step {
+    margin: 3rem 0;
+    padding-top: 0.5rem;
+    scroll-margin-top: 1rem;
+  }
+  section.step h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.35rem;
+    margin-bottom: 0.75rem;
+  }
+  section.step h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.95rem;
+    flex: none;
+  }
+  section.step h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+  section.step p { max-width: 68ch; }
+  section.step ul, section.step ol { max-width: 68ch; }
+
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.88rem;
+  }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--bg-subtle);
+    padding: 0.9rem 1.1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+    max-width: 68ch;
+  }
+  .callout.warn { border-color: var(--warn-border); background: var(--warn-bg); }
+  .callout.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+  .callout p { margin: 0; }
+  .callout p + p { margin-top: 0.5rem; }
+  .callout strong.label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; color: var(--text-muted); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 68ch;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg-subtle); }
+
+  .path { font-weight: 600; }
+
+  footer.page-footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .kbd {
+    display: inline-block;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.05em 0.4em;
+    font-family: monospace;
+    font-size: 0.85em;
+    background: var(--bg-subtle);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page-header">
+  <p class="eyebrow">LinkedIn Archive · Setup Guide</p>
+  <h1>Set up your own LinkedIn Archive on your own domain</h1>
+  <p class="lede">
+    A complete, exact walkthrough for taking this repository from a fork to a live
+    personal website — with your LinkedIn posts, your branding, and your own domain
+    name — using GitHub Pages for hosting. No LinkedIn scraping, no server to run,
+    no password stored anywhere.
+  </p>
+</header>
+
+<nav class="toc" aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#prereqs">Before you start</a></li>
+    <li><a href="#fork">Fork and clone the repository</a></li>
+    <li><a href="#configure">Configure your site</a></li>
+    <li><a href="#profile">Set up your profile / About page</a></li>
+    <li><a href="#content">Get your LinkedIn posts in — two options</a></li>
+    <li><a href="#linkedin-app">Option A: connect the LinkedIn API</a></li>
+    <li><a href="#import-json">Option B: import posts as JSON</a></li>
+    <li><a href="#push">Push your changes to GitHub</a></li>
+    <li><a href="#pages">Enable GitHub Pages</a></li>
+    <li><a href="#domain">Point your own domain at the site</a></li>
+    <li><a href="#nightly">Turn on nightly sync (optional)</a></li>
+    <li><a href="#verify">Verify everything works</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+  </ol>
+</nav>
+
+<section class="step" id="prereqs">
+  <h2><span class="num">1</span> Before you start</h2>
+  <p>You'll need:</p>
+  <ul>
+    <li>A <strong>GitHub account</strong>.</li>
+    <li>A <strong>domain name you own</strong> (from any registrar — Namecheap, Google Domains/Squarespace, Cloudflare, GoDaddy, etc.) and the ability to edit its DNS records.</li>
+    <li>Optional but recommended for the initial setup: a terminal with <code>git</code> installed, and <a href="https://docs.astral.sh/uv/">uv</a> installed (<code>curl -LsSf https://astral.sh/uv/install.sh | sh</code>) so you can preview the site locally before pushing. Everything can also be done through the GitHub web UI plus GitHub Actions if you'd rather not install anything locally — noted inline where that applies.</li>
+    <li>Optional: your own LinkedIn posts, if you want to connect live sync rather than starting with the bundled sample content.</li>
+  </ul>
+  <div class="callout">
+    <strong class="label">What you will NOT need</strong>
+    <p>Your LinkedIn password anywhere, a server to rent or maintain, or a database. Everything ends up as static files served by GitHub Pages.</p>
+  </div>
+</section>
+
+<section class="step" id="fork">
+  <h2><span class="num">2</span> Fork and clone the repository</h2>
+  <ol>
+    <li>Open the repository on GitHub and click <strong>Fork</strong> (top right). This creates <code>github.com/&lt;your-username&gt;/linkedin-archive</code> under your account.</li>
+    <li>Clone your fork locally:</li>
+  </ol>
+<pre><code>git clone https://github.com/&lt;your-username&gt;/linkedin-archive.git
+cd linkedin-archive
+uv sync</code></pre>
+  <p>Confirm it works before changing anything:</p>
+<pre><code>uv run linkedin-archive build
+uv run linkedin-archive serve</code></pre>
+  <p>Open the printed local URL (typically <code>http://127.0.0.1:8000/</code>) — you should see a working site built from the bundled fictional sample posts.</p>
+</section>
+
+<section class="step" id="configure">
+  <h2><span class="num">3</span> Configure your site</h2>
+  <p>Open <code class="path">config.yaml</code> at the repository root. This is the only file most people need to edit — no Python knowledge required.</p>
+  <p>Edit the <code>site:</code> section:</p>
+<pre><code>site:
+  title: "Your Name's Archive"
+  description: "A short description of what you write about."
+  author: "Your Name"
+  url: "https://your-domain.com"          # your own domain — see step 10
+  linkedin_url: "https://www.linkedin.com/in/your-linkedin-handle"
+  language: "en"</code></pre>
+  <div class="callout warn">
+    <strong class="label">About site.url</strong>
+    <p>Set this to the final custom domain you plan to use (step 10), even before DNS is live — it only affects links baked into the generated pages (canonical URLs, RSS, sitemap), not where the site is actually hosted.</p>
+  </div>
+  <p>Optionally customize <code>theme:</code> (accent color, dark/light default, how many featured/recent posts to show) and <code>categories:</code> (see <a href="configuration.md">docs/configuration.md</a> for the full reference — categories are entirely yours to define, there's nothing hardcoded).</p>
+</section>
+
+<section class="step" id="profile">
+  <h2><span class="num">4</span> Set up your profile / About page</h2>
+  <p>Edit <code class="path">content/profile/profile.yaml</code>:</p>
+<pre><code>name: "Your Name"
+headline: "Your one-line professional headline"
+location: "City, Country"
+bio: |
+  Write a couple of paragraphs about yourself here. This supports
+  Markdown and appears on both the home page and the About page.
+avatar: null   # or a URL / path to a photo, e.g. "/static/images/me.jpg"
+links:
+  linkedin: "https://www.linkedin.com/in/your-linkedin-handle"
+  github: "https://github.com/your-username"
+  website: ""
+  email: ""</code></pre>
+  <p>If you want an avatar image, add the image file under <code class="path">static/images/</code> and reference it as <code>/static/images/your-file.jpg</code>.</p>
+</section>
+
+<section class="step" id="content">
+  <h2><span class="num">5</span> Get your LinkedIn posts in — two options</h2>
+  <p>You have two ways to populate the archive with your real posts. You do not need to pick immediately — the site works with the bundled sample content in the meantime, and you can switch later.</p>
+  <table>
+    <tr><th>Option</th><th>Needs LinkedIn API approval?</th><th>Effort</th><th>Keeps updating automatically?</th></tr>
+    <tr><td><strong>A. LinkedIn API</strong></td><td>Yes — LinkedIn must approve member-social-read access first</td><td>Higher, one-time setup</td><td>Yes, nightly via GitHub Actions</td></tr>
+    <tr><td><strong>B. JSON import</strong></td><td>No</td><td>Low — you provide a JSON file</td><td>No — re-run manually whenever you have new posts</td></tr>
+  </table>
+  <p>Continue to step 6 for Option A, or skip to step 7 for Option B.</p>
+</section>
+
+<section class="step" id="linkedin-app">
+  <h2><span class="num">6</span> Option A: connect the LinkedIn API</h2>
+  <p>LinkedIn requires its own review/approval before any app can read a member's own posts (the <code>r_member_social</code> scope, part of a restricted product). This is LinkedIn's policy, not something this project can bypass — and this project never scrapes LinkedIn or stores your password as a workaround.</p>
+
+  <h3>6.1 Create a LinkedIn developer app</h3>
+  <ol>
+    <li>Go to LinkedIn's developer portal and create a new app. LinkedIn requires the app to be linked to a Company Page you administer — create a minimal one if you don't have one already.</li>
+    <li>In the app's <strong>Auth</strong> tab, copy the <strong>Client ID</strong> and <strong>Client Secret</strong> — you'll need both shortly.</li>
+    <li>Under <strong>Authorized redirect URLs for your app</strong>, add:
+      <pre><code>http://localhost:8765/callback</code></pre>
+      This is only used for the one-time interactive login on your own machine.
+    </li>
+    <li>Under the app's <strong>Products</strong> tab, request the product that grants member-social-read permissions. Fill in whatever LinkedIn's review form asks for and submit. <strong>Approval is LinkedIn's process and timeline</strong> — this can take time. You can continue every other step of this guide while waiting.</li>
+  </ol>
+
+  <h3>6.2 Set your local secrets</h3>
+<pre><code>cp .env.example .env</code></pre>
+  <p>Open <code>.env</code> and fill in:</p>
+<pre><code>LINKEDIN_CLIENT_ID=&lt;your client id&gt;
+LINKEDIN_CLIENT_SECRET=&lt;your client secret&gt;
+LINKEDIN_REDIRECT_URI=http://localhost:8765/callback</code></pre>
+  <div class="callout warn">
+    <strong class="label">Never commit this file</strong>
+    <p><code>.env</code> is already listed in <code>.gitignore</code>. Double-check <code>git status</code> never shows it before you push anything.</p>
+  </div>
+
+  <h3>6.3 Authorize once, locally</h3>
+<pre><code>uv run linkedin-archive auth login</code></pre>
+  <p>This opens your browser to LinkedIn's consent screen. Approve access, and you'll be redirected back to a small local page confirming success. The resulting token is saved to <code class="path">.secrets/linkedin_token.json</code> (also gitignored).</p>
+
+  <h3>6.4 Set <code>config.yaml</code> to use LinkedIn</h3>
+<pre><code>sync:
+  provider: linkedin</code></pre>
+
+  <h3>6.5 Try it locally</h3>
+<pre><code>uv run linkedin-archive sync
+uv run linkedin-archive serve</code></pre>
+  <p>If your app hasn't been approved yet, this will fail with a clear <code>403 Forbidden</code> message rather than doing anything unexpected — that's expected until LinkedIn approves your product request. Switch <code>sync.provider</code> back to <code>sample</code>, or use Option B, in the meantime.</p>
+
+  <h3>6.6 Add the same secrets to GitHub, for automated nightly sync</h3>
+  <p>In your fork on GitHub: <strong>Settings → Secrets and variables → Actions → New repository secret</strong>. Add three secrets:</p>
+  <table>
+    <tr><th>Secret name</th><th>Value</th></tr>
+    <tr><td><code>LINKEDIN_CLIENT_ID</code></td><td>Same value as in your local <code>.env</code></td></tr>
+    <tr><td><code>LINKEDIN_CLIENT_SECRET</code></td><td>Same value as in your local <code>.env</code></td></tr>
+    <tr><td><code>LINKEDIN_TOKEN_JSON</code></td><td>The entire contents of your local <code class="path">.secrets/linkedin_token.json</code> file (open it, copy everything, paste as the secret value)</td></tr>
+  </table>
+  <div class="callout">
+    <strong class="label">Why paste a token instead of logging in from GitHub Actions</strong>
+    <p>The interactive OAuth flow needs a browser, which a GitHub Actions runner doesn't have. You authorize once on your own machine, then hand the resulting token to GitHub as a secret. If your app was also granted LinkedIn's <code>offline_access</code> product, the token refreshes itself automatically going forward.</p>
+  </div>
+  <p>Continue to step 8 (push your changes) — you can skip step 7.</p>
+</section>
+
+<section class="step" id="import-json">
+  <h2><span class="num">7</span> Option B: import posts as JSON</h2>
+  <p>Collect your posts (copy them manually, export them, however you prefer) into a JSON file matching this format — save it anywhere, e.g. <code>my-posts.json</code>:</p>
+<pre><code>{
+  "posts": [
+    {
+      "id": "1",
+      "published_at": "2026-08-20T10:30:00Z",
+      "text": "The text of your post here, including #hashtags naturally.",
+      "url": "https://www.linkedin.com/posts/your-handle_...",
+      "title": "Optional — omit to auto-derive from the first sentence"
+    }
+  ]
+}</code></pre>
+  <p>Only <code>id</code>, <code>published_at</code>, and <code>text</code> are required per post. Then run:</p>
+<pre><code>uv run linkedin-archive import my-posts.json
+uv run linkedin-archive serve</code></pre>
+  <p>This creates one Markdown file per post under <code class="path">content/posts/</code> and rebuilds the site. Re-run this command any time you have new posts to add — it's safe to run repeatedly (it won't create duplicates).</p>
+</section>
+
+<section class="step" id="push">
+  <h2><span class="num">8</span> Push your changes to GitHub</h2>
+<pre><code>git add config.yaml content/ .github
+git status   # double check .env and .secrets/ are NOT listed
+git commit -m "Configure my LinkedIn Archive"
+git push</code></pre>
+</section>
+
+<section class="step" id="pages">
+  <h2><span class="num">9</span> Enable GitHub Pages</h2>
+  <ol>
+    <li>On your fork, go to <strong>Settings → Pages</strong>.</li>
+    <li>Under <strong>Build and deployment → Source</strong>, choose <strong>GitHub Actions</strong> (not "Deploy from a branch").</li>
+    <li>Go to the <strong>Actions</strong> tab. If <em>Deploy site</em> hasn't run automatically from your push, open it and click <strong>Run workflow</strong>.</li>
+    <li>When it finishes (both the <code>build</code> and <code>deploy</code> jobs green), go back to <strong>Settings → Pages</strong> — it will show your live URL, something like <code>https://your-username.github.io/linkedin-archive/</code>.</li>
+  </ol>
+  <div class="callout ok">
+    <strong class="label">Checkpoint</strong>
+    <p>Open that URL. You should see your configured title, your profile bio, and either your imported/synced posts or the sample posts. If this works, everything through hosting is done — the rest of this guide is about using your own domain instead of the default <code>github.io</code> URL.</p>
+  </div>
+</section>
+
+<section class="step" id="domain">
+  <h2><span class="num">10</span> Point your own domain at the site</h2>
+
+  <h3>10.1 Decide: apex domain or subdomain</h3>
+  <p>Either <code>your-domain.com</code> (apex/root domain) or a subdomain like <code>archive.your-domain.com</code> works. A subdomain is simpler to set up.</p>
+
+  <h3>10.2 Add DNS records</h3>
+  <p>Log into your domain registrar or DNS provider's dashboard (Namecheap, Cloudflare, Google Domains/Squarespace, GoDaddy, etc.) and add records:</p>
+  <table>
+    <tr><th>If using</th><th>Record type</th><th>Host / Name</th><th>Value</th></tr>
+    <tr><td rowspan="4">Apex domain (<code>your-domain.com</code>)</td><td>A</td><td>@</td><td>185.199.108.153</td></tr>
+    <tr><td>A</td><td>@</td><td>185.199.109.153</td></tr>
+    <tr><td>A</td><td>@</td><td>185.199.110.153</td></tr>
+    <tr><td>A</td><td>@</td><td>185.199.111.153</td></tr>
+    <tr><td>Subdomain (<code>archive.your-domain.com</code>)</td><td>CNAME</td><td>archive</td><td><code>your-username.github.io</code></td></tr>
+  </table>
+  <p>(Optional, for IPv6 on an apex domain, also add <code>AAAA</code> records pointing to <code>2606:50c0:8000::153</code>, <code>2606:50c0:8001::153</code>, <code>2606:50c0:8002::153</code>, <code>2606:50c0:8003::153</code>.)</p>
+  <p>DNS changes can take anywhere from a few minutes to a few hours to propagate.</p>
+
+  <h3>10.3 Tell GitHub about your domain</h3>
+  <ol>
+    <li>In your fork: <strong>Settings → Pages → Custom domain</strong>, enter <code>your-domain.com</code> or <code>archive.your-domain.com</code>, click <strong>Save</strong>.</li>
+    <li>Also add the domain directly to the repository so it survives rebuilds (GitHub's UI writes a <code>CNAME</code> file into the *deployed* output, but since this project rebuilds the site fresh every time rather than committing <code>dist/</code>, commit it yourself so every build includes it):</li>
+  </ol>
+<pre><code>echo "your-domain.com" &gt; static/CNAME
+git add static/CNAME
+git commit -m "Add custom domain"
+git push</code></pre>
+  <ol start="3">
+    <li>Back in <strong>Settings → Pages</strong>, once GitHub verifies the DNS record, check <strong>Enforce HTTPS</strong> (it may be greyed out for a few minutes while GitHub issues a certificate — refresh the page after a bit).</li>
+  </ol>
+
+  <h3>10.4 Update your site configuration to match</h3>
+  <p>Edit <code class="path">config.yaml</code>:</p>
+<pre><code>site:
+  url: "https://your-domain.com"     # or https://archive.your-domain.com</code></pre>
+<pre><code>git add config.yaml
+git commit -m "Update site url to custom domain"
+git push</code></pre>
+  <p>This push triggers <em>Deploy site</em> automatically (it watches for changes to <code>config.yaml</code>) and republishes with the corrected canonical URLs, sitemap, and RSS feed.</p>
+</section>
+
+<section class="step" id="nightly">
+  <h2><span class="num">11</span> Turn on nightly sync (optional, LinkedIn API only)</h2>
+  <p>If you completed step 6, nothing else is needed — <code class="path">.github/workflows/sync.yml</code> is already scheduled to run nightly and will commit any new posts to <code>content/</code>, which in turn triggers <em>Deploy site</em> automatically.</p>
+  <p>To change the schedule, edit the <code>cron</code> line in <code class="path">.github/workflows/sync.yml</code> (it uses standard 5-field cron syntax, evaluated in UTC). To trigger it manually at any time: <strong>Actions → Sync LinkedIn content → Run workflow</strong>.</p>
+  <p>If you're using JSON import (Option B) instead, there's nothing to schedule — just re-run <code>linkedin-archive import</code> and push whenever you have new posts.</p>
+</section>
+
+<section class="step" id="verify">
+  <h2><span class="num">12</span> Verify everything works</h2>
+  <ul>
+    <li>Visit your domain — the home page loads with your name, bio, and posts.</li>
+    <li>Open a post directly and confirm the "View original post on LinkedIn" link is correct.</li>
+    <li>Visit <code>/search/</code>, type a word from one of your posts, confirm results appear. Press <span class="kbd">/</span> anywhere on the site to jump to search.</li>
+    <li>Check <code>/feed.xml</code> and <code>/sitemap.xml</code> load and look like well-formed XML.</li>
+    <li>Toggle dark/light mode with the header button.</li>
+    <li>Resize your browser narrow (or check on your phone) to confirm the layout adapts.</li>
+    <li>Run <code>uv run linkedin-archive validate</code> locally any time you're unsure — it flags malformed content, duplicate post IDs, unknown categories, and broken internal links before you push.</li>
+  </ul>
+</section>
+
+<section class="step" id="troubleshooting">
+  <h2><span class="num">13</span> Troubleshooting</h2>
+  <table>
+    <tr><th>Symptom</th><th>Likely fix</th></tr>
+    <tr><td>Deploy workflow fails</td><td>Open the failed run's logs in the <strong>Actions</strong> tab — <code>linkedin-archive validate</code> runs first and will name the exact content problem.</td></tr>
+    <tr><td><code>sync</code> fails with 403 Forbidden</td><td>Your LinkedIn app hasn't been approved for member-social-read access yet. Use Option B (JSON import) until it is.</td></tr>
+    <tr><td><code>auth login</code> never redirects back</td><td><code>LINKEDIN_REDIRECT_URI</code> in <code>.env</code> must exactly match an Authorized redirect URL on your LinkedIn app, including the port.</td></tr>
+    <tr><td>Pages shows 404 at your domain</td><td>Confirm DNS records match step 10.2 exactly, confirm <code>static/CNAME</code> contains only your domain with no <code>https://</code> prefix, and re-check <strong>Settings → Pages</strong> shows the domain as verified.</td></tr>
+    <tr><td>HTTPS won't enable</td><td>Wait — GitHub can take a few hours after DNS is correct to issue a certificate. Revisit <strong>Settings → Pages</strong> later.</td></tr>
+    <tr><td>Sync workflow can't push new content</td><td>Check <strong>Settings → Actions → General → Workflow permissions</strong> is set to "Read and write permissions".</td></tr>
+  </table>
+  <p>For more detail see <a href="linkedin-api.md">docs/linkedin-api.md</a>, <a href="deployment.md">docs/deployment.md</a>, and the README's Troubleshooting section.</p>
+</section>
+
+<footer class="page-footer">
+  <p>LinkedIn Archive is open source (Apache License 2.0). This guide lives at <code>docs/setup-guide.html</code> — update it alongside <code>docs/deployment.md</code> and <code>docs/linkedin-api.md</code> if any of these steps change.</p>
+</footer>
+
+</div>
+</body>
+</html>

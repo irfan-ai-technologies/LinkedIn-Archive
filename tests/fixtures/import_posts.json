@@ -1,0 +1,26 @@
+{
+  "posts": [
+    {
+      "id": "1001",
+      "published_at": "2026-02-01T10:00:00Z",
+      "author": "Test Author",
+      "title": "Test post about agentic AI",
+      "text": "Building agentic AI systems requires careful tool design. #AgenticAI #MCP https://example.com/reference",
+      "url": "https://www.linkedin.com/posts/test-author_agenticai-activity-1001"
+    },
+    {
+      "id": "1002",
+      "published_at": "2026-02-10T08:30:00Z",
+      "author": "Test Author",
+      "text": "Software architecture is about managing change. #SoftwareEngineering #Architecture",
+      "url": "https://www.linkedin.com/posts/test-author_softwareengineering-activity-1002"
+    },
+    {
+      "id": "1003",
+      "published_at": "2026-02-15T12:00:00Z",
+      "author": "Test Author",
+      "text": "A short update with no obvious category.",
+      "url": "https://www.linkedin.com/posts/test-author_update-activity-1003"
+    }
+  ]
+}

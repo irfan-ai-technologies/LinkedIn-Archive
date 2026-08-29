@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Archive · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header"><h1>Archive</h1></div>
+<div class="archive-tree">
+  {% for year, year_count, months in years %}
+  <section class="archive-year">
+    <h2><a href="{{ archive_year_url(year) }}">{{ year }}</a> <span class="chip-count">{{ year_count }}</span></h2>
+    <ul class="archive-months">
+      {% for month, month_name, count in months %}
+      <li><a href="{{ archive_month_url(year, month) }}">{{ month_name }}</a> <span class="chip-count">{{ count }}</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

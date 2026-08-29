@@ -1,0 +1,76 @@
+{
+  "posts": [
+    {
+      "id": "sample-001",
+      "published_at": "2026-01-12T09:15:00Z",
+      "author": "Jordan Rivera",
+      "title": "Why agentic AI changes how we design software",
+      "text": "Agentic AI systems are forcing us to rethink software architecture from the ground up. Instead of a single request/response cycle, we now design for agents that plan, call tools, and recover from failure autonomously. The teams that win here treat the agent loop itself as a first-class architectural component, not an afterthought bolted onto an existing service. #AgenticAI #SoftwareArchitecture #AI",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_agenticai-softwarearchitecture-ai-activity-0001",
+      "hashtags": ["AgenticAI", "SoftwareArchitecture", "AI"]
+    },
+    {
+      "id": "sample-002",
+      "published_at": "2026-01-28T14:00:00Z",
+      "author": "Jordan Rivera",
+      "title": "Three lessons from six months of MCP servers in production",
+      "text": "We shipped six Model Context Protocol servers this year. The biggest lesson: treat every tool definition like a public API contract, because an agent will use it in ways you didn't anticipate. Second: log everything, because debugging an agent's tool-call sequence after the fact is the only way to understand failures. Third: keep tools narrow and composable rather than building one giant do-everything tool. #MCP #AgenticAI #Engineering",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_mcp-agenticai-engineering-activity-0002",
+      "hashtags": ["MCP", "AgenticAI", "Engineering"]
+    },
+    {
+      "id": "sample-003",
+      "published_at": "2026-02-05T08:30:00Z",
+      "author": "Jordan Rivera",
+      "title": "The most underrated skill in machine learning teams",
+      "text": "Everyone wants to talk about model architecture. Almost nobody wants to talk about data pipeline reliability, and that's exactly where most ML projects quietly die. If your training data pipeline breaks silently, no amount of clever modeling saves the project. #MachineLearning #DataEngineering #ArtificialIntelligence",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_machinelearning-dataengineering-activity-0003",
+      "hashtags": ["MachineLearning", "DataEngineering", "ArtificialIntelligence"]
+    },
+    {
+      "id": "sample-004",
+      "published_at": "2026-02-18T11:45:00Z",
+      "author": "Jordan Rivera",
+      "title": "Leading engineers through an AI-driven re-org",
+      "text": "Reorganizing a 40-person engineering team around AI-native workflows taught me that the hardest part isn't the tooling, it's the leadership conversations. People need a clear story about what changes for them personally, not just a company-wide memo about the future of work. #Leadership #Management #TeamBuilding",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_leadership-management-teambuilding-activity-0004",
+      "hashtags": ["Leadership", "Management", "TeamBuilding"]
+    },
+    {
+      "id": "sample-005",
+      "published_at": "2026-03-02T16:20:00Z",
+      "author": "Jordan Rivera",
+      "title": "A simple system design heuristic that has saved me repeatedly",
+      "text": "Whenever I'm unsure how to split a service boundary, I ask: which side of this line changes more often? Put the volatile logic behind the interface that changes least. It's not a universal law, but it has resolved more architecture debates on my teams than any diagram. #SoftwareEngineering #SystemDesign #Architecture",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_softwareengineering-systemdesign-architecture-activity-0005",
+      "hashtags": ["SoftwareEngineering", "SystemDesign", "Architecture"]
+    },
+    {
+      "id": "sample-006",
+      "published_at": "2026-03-21T07:00:00Z",
+      "author": "Jordan Rivera",
+      "title": "What I look for when interviewing senior engineers",
+      "text": "I stopped asking algorithm trivia years ago. Now I ask candidates to walk me through a system they regret building and what they'd change. The answer tells me more about seniority than any whiteboard exercise ever did. #Career #Interviewing #ProfessionalDevelopment",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_career-interviewing-professionaldevelopment-activity-0006",
+      "hashtags": ["Career", "Interviewing", "ProfessionalDevelopment"]
+    },
+    {
+      "id": "sample-007",
+      "published_at": "2026-04-09T13:10:00Z",
+      "author": "Jordan Rivera",
+      "title": "Multi-agent systems are a distributed systems problem in disguise",
+      "text": "The failure modes of multi-agent AI systems look a lot like classic distributed systems failures: partial failure, retries causing duplicate side effects, and coordination without a single source of truth. If your team has distributed systems experience, you already know more about building reliable agents than you think. #AgenticAI #DistributedSystems #AIEngineering",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_agenticai-distributedsystems-aiengineering-activity-0007",
+      "hashtags": ["AgenticAI", "DistributedSystems", "AIEngineering"]
+    },
+    {
+      "id": "sample-008",
+      "published_at": "2026-05-14T10:00:00Z",
+      "author": "Jordan Rivera",
+      "title": "The best documentation is the one nobody has to write twice",
+      "text": "Good engineering documentation isn't about writing more, it's about writing the thing once in the place people will actually look. A single well-maintained architecture doc beats ten stale wikis nobody trusts. #SoftwareEngineering #Documentation #Engineering",
+      "url": "https://www.linkedin.com/posts/jordan-rivera_softwareengineering-documentation-engineering-activity-0008",
+      "hashtags": ["SoftwareEngineering", "Documentation", "Engineering"]
+    }
+  ]
+}

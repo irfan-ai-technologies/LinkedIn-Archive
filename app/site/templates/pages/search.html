@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Search · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header"><h1>Search</h1></div>
+<div class="search-page" data-search-index-url="{{ search_index_url() }}">
+  <form class="search-form" role="search" autocomplete="off" onsubmit="return false;">
+    <label class="visually-hidden" for="search-input">Search posts</label>
+    <input id="search-input" type="search" placeholder="Search posts… (press / to focus)" aria-describedby="search-help">
+    <p id="search-help" class="search-help">Searches title, content, category, tags, and author. Press <kbd>/</kbd> anywhere to jump here.</p>
+  </form>
+  <div class="search-filters">
+    <label>Category
+      <select id="filter-category"><option value="">All categories</option></select>
+    </label>
+    <label>Tag
+      <select id="filter-tag"><option value="">All tags</option></select>
+    </label>
+    <label>Year
+      <select id="filter-year"><option value="">All years</option></select>
+    </label>
+    <label>Sort
+      <select id="filter-sort">
+        <option value="relevance">Relevance</option>
+        <option value="date">Newest first</option>
+      </select>
+    </label>
+  </div>
+  <p id="search-status" class="search-status" role="status" aria-live="polite">Type to search {{ total_count }} posts.</p>
+  <ul id="search-results" class="search-results"></ul>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/search.js" defer></script>
+{% endblock %}

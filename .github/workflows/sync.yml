@@ -1,0 +1,87 @@
+name: Sync LinkedIn content
+
+# Fetches new posts from the configured provider, regenerates the static
+# site, and commits any changes. Runs nightly and can be triggered manually.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   LINKEDIN_CLIENT_ID       (only if sync.provider: linkedin in config.yaml)
+#   LINKEDIN_CLIENT_SECRET   (only if sync.provider: linkedin)
+#   LINKEDIN_TOKEN_JSON      (only if sync.provider: linkedin — the contents
+#                             of the token file produced by
+#                             `linkedin-archive auth login` run locally once)
+#
+# With the default sync.provider: sample (or after switching to `import`),
+# no secrets are required at all.
+
+on:
+  schedule:
+    # Nightly at 03:17 UTC. Off-the-hour to avoid GitHub Actions' scheduling
+    # rush at :00. Edit this cron expression to change the cadence.
+    - cron: "17 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linkedin-archive-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Restore LinkedIn OAuth token (if configured)
+        if: env.LINKEDIN_TOKEN_JSON != ''
+        env:
+          LINKEDIN_TOKEN_JSON: ${{ secrets.LINKEDIN_TOKEN_JSON }}
+        run: |
+          mkdir -p .secrets
+          umask 077
+          printf '%s' "$LINKEDIN_TOKEN_JSON" > .secrets/linkedin_token.json
+
+      - name: Run sync
+        env:
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          LINKEDIN_TOKEN_STORE: .secrets/linkedin_token.json
+        run: uv run linkedin-archive sync
+
+      - name: Validate content
+        run: uv run linkedin-archive validate
+
+      # Note: dist/ is gitignored and never committed (see docs/architecture.md
+      # for why). This job commits only the normalized Markdown in content/;
+      # pushing that change triggers deploy.yml, which does the real build
+      # and publishes it via the GitHub Pages artifact.
+      - name: Commit content changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: sync LinkedIn Archive content"
+            git push
+          fi
+
+      - name: Remove local token file
+        if: always()
+        run: rm -rf .secrets

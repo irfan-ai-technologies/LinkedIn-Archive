@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% import "partials/post_card.html" as cards %}
+{% block title %}{{ post.title or post.excerpt[:60] }} · {{ site.title }}{% endblock %}
+{% block description %}{{ post.excerpt }}{% endblock %}
+{% block og %}
+{% for key, value in open_graph(title=post.title or post.excerpt[:60], description=post.excerpt, url=canonical_path, config=config, og_type='article').items() %}
+<meta property="{{ key }}" content="{{ value }}">
+{% endfor %}
+{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">{{ post_json_ld(post, config)|tojson }}</script>
+{% endblock %}
+{% block content %}
+<article class="post">
+  <header class="post-header">
+    <a class="badge badge-category" href="{{ category_url(category_slug_map[post.category]) }}">{{ post.category }}</a>
+    <h1>{{ post.title or post.excerpt[:80] }}</h1>
+    <div class="post-meta">
+      <span>{{ post.author }}</span>
+      <span aria-hidden="true">·</span>
+      <time datetime="{{ post.published_at.isoformat() }}">{{ post.published_at|format_date }}</time>
+      {% if theme.show_reading_time %}<span aria-hidden="true">·</span><span>{{ post.reading_time_minutes }} min read</span>{% endif %}
+      {% if theme.show_word_count %}<span aria-hidden="true">·</span><span>{{ post.word_count }} words</span>{% endif %}
+      {% if post.is_updated %}<span aria-hidden="true">·</span><span>Updated {{ post.updated_at|format_date }}</span>{% endif %}
+    </div>
+  </header>
+
+  <div class="prose">{{ post.content|render_markdown|safe }}</div>
+
+  {% if post.media %}
+  <div class="post-media">
+    {% for m in post.media %}
+      {% if m.type == 'image' %}
+      <img src="{{ m.url }}" alt="{{ m.alt_text or '' }}" loading="lazy">
+      {% elif m.type == 'video' %}
+      <video controls preload="none" src="{{ m.url }}"></video>
+      {% else %}
+      <a class="btn" href="{{ m.url }}" rel="noopener noreferrer" target="_blank">{{ m.title or 'View attachment' }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="post-footer">
+    <div class="tag-cloud">
+      {% for tag in post.tags %}<a class="chip" href="{{ tag_url(tag) }}">#{{ tag }}</a>{% endfor %}
+    </div>
+    {% if post.source_url %}
+    <p class="post-source"><a href="{{ post.source_url }}" rel="noopener noreferrer" target="_blank">View original post on LinkedIn &#8599;</a></p>
+    {% endif %}
+  </div>
+</article>
+
+<nav class="post-neighbors" aria-label="Post navigation">
+  {% if previous_post %}
+  <a class="post-neighbor" href="{{ post_url(previous_post.id) }}">
+    <span class="post-neighbor-label">&larr; Previous</span>
+    <span class="post-neighbor-title">{{ previous_post.title or previous_post.excerpt[:60] }}</span>
+  </a>
+  {% else %}<span></span>{% endif %}
+  {% if next_post %}
+  <a class="post-neighbor post-neighbor-next" href="{{ post_url(next_post.id) }}">
+    <span class="post-neighbor-label">Next &rarr;</span>
+    <span class="post-neighbor-title">{{ next_post.title or next_post.excerpt[:60] }}</span>
+  </a>
+  {% endif %}
+</nav>
+
+{% if related_posts %}
+<section aria-labelledby="related-heading">
+  <div class="section-header"><h2 id="related-heading">Related posts</h2></div>
+  <div class="post-grid">
+    {% for related in related_posts %}{{ cards.post_card(related) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

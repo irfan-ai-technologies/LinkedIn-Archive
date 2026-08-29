@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Page not found · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="not-found">
+  <h1>404 — Page not found</h1>
+  <p>The page you're looking for doesn't exist or may have moved.</p>
+  <a class="btn btn-primary" href="{{ home_url() }}">Back to home</a>
+</div>
+{% endblock %}

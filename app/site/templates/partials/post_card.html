@@ -1,0 +1,15 @@
+{% macro post_card(post, show_category=true) %}
+<article class="post-card">
+  <div class="post-card-meta">
+    <time datetime="{{ post.published_at.isoformat() }}">{{ post.published_at|format_date }}</time>
+    {% if theme.show_reading_time %}<span aria-hidden="true">·</span><span>{{ post.reading_time_minutes }} min read</span>{% endif %}
+    {% if post.featured %}<span class="badge badge-featured">Featured</span>{% endif %}
+  </div>
+  <h3 class="post-card-title"><a href="{{ post_url(post.id) }}">{{ post.title or post.excerpt[:80] }}</a></h3>
+  <p class="post-card-excerpt">{{ post.excerpt }}</p>
+  <div class="post-card-footer">
+    {% if show_category %}<a class="badge badge-category" href="{{ category_url(category_slug_map[post.category]) }}">{{ post.category }}</a>{% endif %}
+    {% for tag in post.tags[:4] %}<a class="chip" href="{{ tag_url(tag) }}">#{{ tag }}</a>{% endfor %}
+  </div>
+</article>
+{% endmacro %}

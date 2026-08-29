@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="{{ site.language }}" data-theme-default="{{ theme.default_mode }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+  <link rel="canonical" href="{{ config.site_url }}{{ canonical_path|default('/') }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ feed_url() }}">
+  <link rel="sitemap" type="application/xml" href="{{ sitemap_url() }}">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <meta name="theme-color" content="{{ theme.accent_color }}">
+  {% block og %}
+  {% for key, value in open_graph(title=self.title()|trim, description=site.description, url=canonical_path|default('/'), config=config).items() %}
+  <meta property="{{ key }}" content="{{ value }}">
+  {% endfor %}
+  {% endblock %}
+  {% block structured_data %}
+  <script type="application/ld+json">{{ website_json_ld(config)|tojson }}</script>
+  {% endblock %}
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="site-title" href="{{ home_url() }}">{{ site.title }}</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="{{ posts_index_url() }}">Posts</a>
+        <a href="{{ category_index_url() }}">Categories</a>
+        <a href="{{ tag_index_url() }}">Tags</a>
+        <a href="{{ archive_index_url() }}">Archive</a>
+        <a href="{{ about_url() }}">About</a>
+        <a class="search-link" href="{{ search_url() }}" aria-label="Search">Search</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+        <span aria-hidden="true">◐</span>
+      </button>
+    </div>
+  </header>
+  <main id="main" class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <p>&copy; {{ profile_footer_year }} {{ site.author }}. Published with <a href="https://github.com/">LinkedIn Archive</a>.</p>
+      <p class="footer-links">
+        {% if site.linkedin_url %}<a href="{{ site.linkedin_url }}" rel="noopener noreferrer" target="_blank">LinkedIn</a>{% endif %}
+        {% if site.links.github %}<a href="{{ site.links.github }}" rel="noopener noreferrer" target="_blank">GitHub</a>{% endif %}
+        {% if site.links.website %}<a href="{{ site.links.website }}" rel="noopener noreferrer" target="_blank">Website</a>{% endif %}
+        <a href="{{ feed_url() }}">RSS</a>
+      </p>
+    </div>
+  </footer>
+  <script src="/static/js/theme.js" defer></script>
+  <script src="/static/js/nav.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

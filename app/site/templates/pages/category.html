@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "partials/post_card.html" as cards %}
+{% import "partials/pagination.html" as pag %}
+{% block title %}{{ category.name }} · {{ site.title }}{% endblock %}
+{% block description %}{{ category.description or site.description }}{% endblock %}
+{% block content %}
+<div class="section-header">
+  <h1>{{ category.name }}</h1>
+  <p>{{ total_count }} post{{ 's' if total_count != 1 }}</p>
+</div>
+{% if category.description %}<p class="category-description">{{ category.description }}</p>{% endif %}
+<div class="post-grid">
+  {% for post in page.items %}{{ cards.post_card(post, show_category=false) }}{% endfor %}
+</div>
+{{ pag.pagination_nav(page, url_for_page) }}
+{% endblock %}

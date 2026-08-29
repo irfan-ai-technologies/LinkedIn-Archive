@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "partials/post_card.html" as cards %}
+{% block title %}{{ month_name }} {{ year }} · Archive · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header">
+  <h1>{{ month_name }} {{ year }}</h1>
+  <p>{{ posts|length }} post{{ 's' if posts|length != 1 }}</p>
+</div>
+<div class="post-grid">
+  {% for post in posts %}{{ cards.post_card(post) }}{% endfor %}
+</div>
+{% endblock %}

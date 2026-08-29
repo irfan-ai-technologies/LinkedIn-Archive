@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Tags · {{ site.title }}{% endblock %}
+{% block content %}
+<div class="section-header"><h1>Tags</h1></div>
+<div class="tag-cloud">
+  {% for tag in tags %}
+  <a class="chip" href="{{ tag_url(tag.slug) }}">#{{ tag.slug }} <span class="chip-count">{{ tag.count }}</span></a>
+  {% endfor %}
+</div>
+{% endblock %}

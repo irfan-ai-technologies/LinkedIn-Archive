@@ -1,0 +1,13 @@
+{% macro pagination_nav(page, url_for_page) %}
+{% if page.total_pages > 1 %}
+<nav class="pagination" aria-label="Pagination">
+  {% if page.has_previous %}
+    <a href="{{ url_for_page(page.previous_page) }}" rel="prev">&larr; Newer</a>
+  {% endif %}
+  <span class="pagination-status">Page {{ page.page_number }} of {{ page.total_pages }}</span>
+  {% if page.has_next %}
+    <a href="{{ url_for_page(page.next_page) }}" rel="next">Older &rarr;</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
