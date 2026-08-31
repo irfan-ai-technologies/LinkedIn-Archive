@@ -195,7 +195,7 @@ Both need nothing but the repository secrets described in [LinkedIn API setup](#
 
 ### Custom domains
 
-1. Add a `CNAME` file to `static/` containing your domain (it gets copied into `dist/` on every build), or set it in the repo's Pages settings.
+1. **Settings → Pages → Custom domain**, enter your domain, save. This is a repository setting that applies to every future deploy automatically — no `CNAME` file needed anywhere in the repo (`deploy.yml` publishes via `actions/deploy-pages`, which ignores one).
 2. Point your domain's DNS at GitHub Pages (an `A`/`AAAA` record set, or a `CNAME` record for a subdomain).
 3. Update `site.url` in `config.yaml` to your domain.
 
