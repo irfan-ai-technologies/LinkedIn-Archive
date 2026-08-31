@@ -49,7 +49,10 @@ _LINK_ALIASES = ("ShareLink", "Share Link", "Link", "Url", "Post Url")
 _SHARED_URL_ALIASES = ("SharedUrl", "Shared Url", "SharedURL")
 _MEDIA_ALIASES = ("MediaUrl", "Media Url", "MediaURL")
 
-_ACTIVITY_ID_RE = re.compile(r"activity[:-](\d{6,})")
+_ACTIVITY_ID_RE = re.compile(r"(?:activity|share|ugcPost)(?:%3A|[:-])(\d{6,})")
+# A group post's URN is "<group id>-<post id>" (e.g. urn:li:groupPost:5096075-
+# 7152589185084706816) — only the second number is stable/unique per post.
+_GROUP_POST_ID_RE = re.compile(r"groupPost(?:%3A|:)\d+-(\d{6,})")
 _IMAGE_EXT_RE = re.compile(r"\.(jpe?g|png|gif|webp|bmp)(\?|$)", re.IGNORECASE)
 _VIDEO_EXT_RE = re.compile(r"\.(mp4|mov|avi|webm)(\?|$)", re.IGNORECASE)
 
@@ -100,12 +103,15 @@ class LinkedInExportProvider:
         candidate = self.export_dir / _SHARES_FILENAME
         if candidate.exists():
             return candidate
-        # Some export zips nest CSVs under a "Basic_LinkedInDataExport_*" folder.
-        for match in sorted(self.export_dir.rglob(_SHARES_FILENAME)):
-            return match
+        # The full "Complete" export suffixes member-specific CSVs with a numeric
+        # member id (e.g. "Shares_155814142.csv"); the "Posts"-only export doesn't.
+        # Some export zips also nest CSVs under a "Basic_LinkedInDataExport_*" folder.
+        for pattern in ("Shares*.csv", "**/Shares*.csv"):
+            for match in sorted(self.export_dir.glob(pattern)):
+                return match
         raise ProviderError(
             self.name,
-            f"{_SHARES_FILENAME} not found under {self.export_dir} — make sure you selected "
+            f"No Shares*.csv found under {self.export_dir} — make sure you selected "
             "the 'Posts' checkbox when requesting your LinkedIn data export and extracted the zip",
         )
 
@@ -186,7 +192,7 @@ class LinkedInExportProvider:
     @staticmethod
     def _derive_id(link: str | None, published_at: datetime, text: str) -> str:
         if link:
-            match = _ACTIVITY_ID_RE.search(link)
+            match = _ACTIVITY_ID_RE.search(link) or _GROUP_POST_ID_RE.search(link)
             if match:
                 return match.group(1)
         # No activity id could be recovered from the link (or there was no

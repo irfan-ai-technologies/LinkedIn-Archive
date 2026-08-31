@@ -99,3 +99,50 @@ def test_only_bare_reposts_raises_provider_error(tmp_path: Path) -> None:
     provider = LinkedInExportProvider(tmp_path)
     with pytest.raises(ProviderError):
         provider.fetch_posts()
+
+
+def test_finds_member_id_suffixed_shares_file(tmp_path: Path) -> None:
+    # LinkedIn's "Complete" export (as opposed to the "Posts"-only export)
+    # suffixes this file with the member's numeric id, e.g. Shares_155814142.csv.
+    (tmp_path / "Shares_155814142.csv").write_text(
+        "Date,ShareLink,ShareCommentary,SharedUrl,MediaUrl\n"
+        "2026-01-01 00:00:00,https://www.linkedin.com/posts/x-activity-7100000000000000009-Ab,"
+        "Hello world,,\n",
+        encoding="utf-8",
+    )
+    provider = LinkedInExportProvider(tmp_path)
+    posts = provider.fetch_posts()
+    assert len(posts) == 1
+
+
+@pytest.mark.parametrize(
+    ("link", "expected_id"),
+    [
+        (
+            "https://www.linkedin.com/feed/update/urn%3Ali%3Ashare%3A7497901238773055488",
+            "7497901238773055488",
+        ),
+        (
+            "https://www.linkedin.com/feed/update/urn%3Ali%3AugcPost%3A7484213811479076864",
+            "7484213811479076864",
+        ),
+        (
+            "https://www.linkedin.com/feed/update/urn%3Ali%3AgroupPost%3A5096075-7152589185084706816",
+            "7152589185084706816",
+        ),
+        (
+            "https://www.linkedin.com/posts/janedoe_agenticai-activity-7150000000000000001-AbCd",
+            "7150000000000000001",
+        ),
+    ],
+)
+def test_activity_id_extracted_from_real_linkedin_url_formats(
+    tmp_path: Path, link: str, expected_id: str
+) -> None:
+    (tmp_path / "Shares.csv").write_text(
+        f"Date,ShareLink,ShareCommentary,SharedUrl,MediaUrl\n2026-01-01 00:00:00,{link},Hello,,\n",
+        encoding="utf-8",
+    )
+    provider = LinkedInExportProvider(tmp_path)
+    posts = provider.fetch_posts()
+    assert posts[0].source_id == expected_id
