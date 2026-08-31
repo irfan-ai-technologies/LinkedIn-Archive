@@ -18,7 +18,7 @@ Nothing outside `app/ingestion/` depends on a concrete provider — the sync eng
 | `sample` | `app/ingestion/sample.py` | No — bundled fictional posts, used for demos, development, and CI |
 | `import` | `app/ingestion/json_import.py` | No — reads a local JSON file |
 | `linkedin_export` | `app/ingestion/linkedin_export.py` | No — reads LinkedIn's own personal data export |
-| `linkedin` | `app/ingestion/linkedin.py` + `linkedin_oauth.py` | Yes — see [`linkedin-api.md`](linkedin-api.md) |
+| `linkedin` | `app/ingestion/linkedin.py` + `linkedin_oauth.py` | Yes — and currently unobtainable for a new app (see [`linkedin-api.md`](linkedin-api.md)) |
 
 ## Importing from LinkedIn's own data export
 

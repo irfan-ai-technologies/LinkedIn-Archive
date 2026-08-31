@@ -76,10 +76,8 @@ uv run linkedin-archive serve
 Open the printed URL. You now have a working archive built from fictional sample posts. From here:
 
 1. Edit `config.yaml` — your name, title, description, LinkedIn URL, categories.
-2. Edit `content/profile/profile.yaml` — your bio.
-3. Either:
-   - **Import your real posts**: export/collect them into the [JSON import format](#importing-existing-posts) and run `uv run linkedin-archive import your-posts.json`, or
-   - **Connect LinkedIn's API**: see [LinkedIn API setup](#linkedin-api-setup) below.
+2. Edit `content/profile/profile.yaml` — your bio (or skip to step 3 and let `import-profile` fill it in for you).
+3. Get your real posts in — [request a LinkedIn data export](#importing-existing-posts) and run `uv run linkedin-archive import-export path/to/export/`. (The LinkedIn API is documented too, but LinkedIn isn't currently granting new access to it — see [LinkedIn API setup](#linkedin-api-setup) for why.)
 4. Push to GitHub, enable Pages, and let the nightly workflow keep it in sync. See [GitHub Actions](#github-actions) and [GitHub Pages deployment](#github-pages-deployment).
 
 **For the full step-by-step guide to set this up for your own profile and your own domain, see [`docs/setup-guide.html`](docs/setup-guide.html).**
@@ -103,23 +101,6 @@ categories:
 
 Full reference: [`docs/configuration.md`](docs/configuration.md).
 
-## LinkedIn API setup
-
-Reading a member's own posts requires LinkedIn's **restricted member-social-read permissions** (e.g. `r_member_social`), which require LinkedIn's app review/approval — this is not optional and cannot be bypassed. As of this writing, LinkedIn is not accepting new access requests for this permission at all. **This project never scrapes LinkedIn, never automates a browser, and never stores your LinkedIn password.** It uses LinkedIn's official OAuth 2.0 authorization code flow only.
-
-Until your app is approved (or in place of it, since approval isn't currently obtainable), use the **sample** provider (default), the **linkedin_export** provider (reads LinkedIn's own "Download my data" export — see below), or the **import** provider — all three are fully functional and require no LinkedIn API access.
-
-Full walkthrough, required scopes, and troubleshooting: [`docs/linkedin-api.md`](docs/linkedin-api.md).
-
-Quick version:
-
-```bash
-cp .env.example .env
-# Fill in LINKEDIN_CLIENT_ID / LINKEDIN_CLIENT_SECRET from your LinkedIn app
-uv run linkedin-archive auth login   # opens a browser, completes OAuth locally
-uv run linkedin-archive sync --provider linkedin
-```
-
 ## Local development
 
 ```bash
@@ -136,15 +117,15 @@ uv run mypy .                    # type-check
 
 ## Importing existing posts
 
-No LinkedIn API access? Two ways in, no API needed for either:
+This is the primary way to populate a fork with real content — see [LinkedIn API setup](#linkedin-api-setup) below for why the `linkedin` provider isn't a realistic option right now. Two ways in, neither needs any LinkedIn API access:
 
-**From LinkedIn's own data export** — Settings & Privacy → Data privacy → **Get a copy of your data** → check **Posts** (and, separately, **Profile** if you also want the About page filled in — see below). LinkedIn emails a zip; unzip it, then:
+**From LinkedIn's own data export (recommended)** — Settings & Privacy → Data privacy → **Get a copy of your data** → check **Posts** (and, separately, **Profile** if you also want the About page filled in — see below). LinkedIn emails a zip; unzip it, then:
 
 ```bash
 uv run linkedin-archive import-export path/to/unzipped-export/
 ```
 
-This reads `Shares.csv` directly. See [`docs/providers.md`](docs/providers.md) for details and troubleshooting.
+This finds and reads your posts CSV directly (named `Shares.csv` or `Shares_<a long number>.csv`, depending on which export you requested). See [`docs/providers.md`](docs/providers.md) for details and troubleshooting.
 
 **From a hand-written JSON file:**
 
@@ -170,13 +151,35 @@ Either way, imported posts flow through the exact same normalization, categoriza
 
 ## Populating the About page from your LinkedIn profile
 
-If you requested **Profile** in your LinkedIn data export above, `Profile.csv` sits alongside `Shares.csv` in the same unzipped folder:
+If you requested **Profile** in your LinkedIn data export above, `Profile.csv` sits alongside your posts CSV in the same unzipped folder:
 
 ```bash
 uv run linkedin-archive import-profile path/to/unzipped-export/Profile.csv
 ```
 
-This fills in `name`, `headline`, `bio`, and `location` in `content/profile/profile.yaml` — the file that drives both the About page and the home page bio. It never touches `avatar` or `links` (LinkedIn/GitHub/website/email), since the export has no equivalent data for those; edit them by hand in `content/profile/profile.yaml`.
+This fills in `name`, `headline`, `bio`, and `location` in `content/profile/profile.yaml` — the file that drives both the About page and the home page bio. It never touches `avatar` or `links` (LinkedIn/GitHub/website/email), since the export has no equivalent data for those; edit them by hand in `content/profile/profile.yaml`. Also double-check the imported `name` — LinkedIn's First/Last Name fields don't always match the capitalization or order you'd actually want displayed.
+
+## LinkedIn API setup
+
+> **Reference only — not currently usable for a new fork.** Reading a member's own posts requires
+> LinkedIn's `r_member_social` scope, and LinkedIn's own Marketing API FAQ describes that
+> permission as "closed... [not] accepting access requests... due to resource constraints." Not a
+> queue you can wait out — closed to new applicants, full stop, as of this writing.
+
+Reading a member's own posts requires LinkedIn's **restricted member-social-read permissions** (e.g. `r_member_social`), which require LinkedIn's app review/approval — this is not optional and cannot be bypassed. **This project never scrapes LinkedIn, never automates a browser, and never stores your LinkedIn password.** It uses LinkedIn's official OAuth 2.0 authorization code flow only.
+
+This section is kept for reference in case LinkedIn reopens the permission. For posts today, use the **linkedin_export** provider (reads LinkedIn's own "Download my data" export — see [Importing existing posts](#importing-existing-posts) above) or the **import** provider — both are fully functional and require no LinkedIn API access.
+
+Full walkthrough, required scopes, and troubleshooting: [`docs/linkedin-api.md`](docs/linkedin-api.md).
+
+Quick version:
+
+```bash
+cp .env.example .env
+# Fill in LINKEDIN_CLIENT_ID / LINKEDIN_CLIENT_SECRET from your LinkedIn app
+uv run linkedin-archive auth login   # opens a browser, completes OAuth locally
+uv run linkedin-archive sync --provider linkedin
+```
 
 ## GitHub Actions
 
@@ -185,7 +188,7 @@ Two workflows, one job each:
 - **`.github/workflows/sync.yml`** — nightly (`workflow_dispatch` also supported), fetches new posts and commits changes to `content/`.
 - **`.github/workflows/deploy.yml`** — on push to `content/`, `static/`, `app/site/`, or `config.yaml`, builds the site and publishes it to GitHub Pages via the Pages deployment API (no `dist/` is ever committed to git).
 
-Both need nothing but the repository secrets described in [LinkedIn API setup](#linkedin-api-setup) — or no secrets at all if you're using sample/import content.
+`deploy.yml` needs no secrets at all. `sync.yml` needs the repository secrets described in [LinkedIn API setup](#linkedin-api-setup) only if `sync.provider: linkedin` — which, per that section, isn't currently a realistic setting for a new fork. For `linkedin_export`/`import` content, re-run the relevant `import-*` command locally and push; there's nothing for `sync.yml` to do.
 
 ## GitHub Pages deployment
 
@@ -221,7 +224,7 @@ Implement the `ContentProvider` protocol (`app/ingestion/base.py`): one method, 
 
 | Problem | Likely cause |
 |---|---|
-| `linkedin-archive sync` fails with `403 Forbidden` | Your LinkedIn app hasn't been approved for member-social-read permissions yet. Use `sample` or `import` in the meantime. |
+| `linkedin-archive sync` fails with `403 Forbidden` | Your LinkedIn app hasn't been approved for member-social-read permissions yet (and, as of this writing, LinkedIn isn't approving new requests at all). Use `linkedin_export` or `import` instead. |
 | `auth login` never redirects back | Check `LINKEDIN_REDIRECT_URI` matches exactly what's registered on your LinkedIn app, port included. |
 | Build succeeds but search shows no results | Check the browser console for a fetch error on `/search-index.json` — usually a base-path issue if the site is served from a subdirectory. |
 | GitHub Pages shows a 404 | Confirm Pages source is set to "GitHub Actions" and the `deploy.yml` run succeeded. |
@@ -240,7 +243,7 @@ More in [`docs/deployment.md`](docs/deployment.md) and [`docs/linkedin-api.md`](
 
 **Do I need to know Python?** No — fork, edit `config.yaml`, set secrets, enable Pages.
 
-**Do I need LinkedIn API access to start?** No — the sample provider works out of the box, and JSON import works for real content with zero API access.
+**Do I need LinkedIn API access to start?** No — and as of this writing you can't get it even if you wanted to (LinkedIn isn't granting `r_member_social` to new applicants). The sample provider works out of the box; for real content, `linkedin-archive import-export` against your own LinkedIn data export ([Importing existing posts](#importing-existing-posts)) is the recommended path, with JSON import as a manual fallback.
 
 **Will this ever auto-delete my posts?** No. Posts that disappear from the source are kept by default (`sync.preserve_deleted: true` in `config.yaml`).
 
