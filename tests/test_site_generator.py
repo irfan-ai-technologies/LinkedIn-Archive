@@ -106,20 +106,6 @@ def test_build_with_no_posts_still_produces_site(test_config: AppConfig) -> None
     assert (dist / "search-index.json").exists()
 
 
-def test_build_writes_cname_at_dist_root_for_custom_domain(test_config: AppConfig) -> None:
-    test_config.user.site.url = "https://sheikirfanbasha.familyos4u.com"
-    dist = build_site(test_config)
-    assert (dist / "CNAME").read_text(encoding="utf-8").strip() == "sheikirfanbasha.familyos4u.com"
-    # GitHub Pages only honors a CNAME at the artifact root, not under static/.
-    assert not (dist / "static" / "CNAME").exists()
-
-
-def test_build_writes_no_cname_for_default_github_io_url(test_config: AppConfig) -> None:
-    test_config.user.site.url = "https://sheikirfanbasha.github.io/LinkedIn-Archive"
-    dist = build_site(test_config)
-    assert not (dist / "CNAME").exists()
-
-
 def test_rss_and_sitemap_reference_configured_site_url(test_config: AppConfig) -> None:
     _seed_posts(test_config, 2)
     dist = build_site(test_config)

@@ -13,7 +13,6 @@ import shutil
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from urllib.parse import urlparse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from slugify import slugify
@@ -143,7 +142,6 @@ class SiteGenerator:
         self._write_feeds(posts)
         self._write_search_index(posts)
         self._copy_static()
-        self._write_cname()
 
         return self.config.dist_dir
 
@@ -424,20 +422,6 @@ class SiteGenerator:
         if not static_src.exists():
             return
         shutil.copytree(static_src, self.config.dist_dir / "static", dirs_exist_ok=True)
-
-    def _write_cname(self) -> None:
-        """Write ``dist/CNAME`` for a GitHub Pages custom domain, derived from ``site.url``.
-
-        GitHub Pages only recognizes a ``CNAME`` file at the root of the published
-        output — not under ``static/`` (which lands in ``dist/static/``) — and since
-        ``dist/`` is rebuilt from scratch every deploy rather than committed, this has
-        to be regenerated on every build the same way ``robots.txt`` is. A site still
-        served from its default ``*.github.io`` URL gets no ``CNAME`` file at all.
-        """
-        host = urlparse(self.config.site_url).netloc
-        if not host or host.endswith(".github.io"):
-            return
-        (self.config.dist_dir / "CNAME").write_text(host + "\n", encoding="utf-8")
 
 
 def build_site(config: AppConfig) -> Path:
