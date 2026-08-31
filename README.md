@@ -3,10 +3,19 @@
 An open-source, self-hosted personal website that turns your LinkedIn posts into a beautiful, searchable, categorized, static archive — fully under your control, deployable to GitHub Pages for free.
 
 ```
-LinkedIn → nightly sync → normalized content → categorization → static site → your domain
+LinkedIn data export → import-export → normalized content → categorization → static site → your domain
 ```
 
 No ongoing server. No database. No runtime dependency on LinkedIn for visitors. Just Markdown, a static site generator, and GitHub Actions.
+
+> **LinkedIn API access is not currently available for new forks.** Reading a member's own posts
+> requires LinkedIn's `r_member_social` permission, and LinkedIn's own Marketing API FAQ describes
+> it as "closed... [not] accepting access requests... due to resource constraints" — not a review
+> queue, a dead end for any new application. This isn't a limitation of this project; there is no
+> workaround, and this project will never scrape LinkedIn or automate a browser as one. **Use your
+> own [LinkedIn data export](#importing-existing-posts) instead** — it requires no approval from
+> anyone, gets you the same real posts, and is the path this README leads with below. See
+> [LinkedIn API setup](#linkedin-api-setup) for the full explanation.
 
 ---
 
@@ -18,7 +27,8 @@ It's built to be **forked**, not just run. Every fork owner configures their own
 
 ## Features
 
-- **Nightly sync** from LinkedIn via the official OAuth API (or a local JSON import, or bundled sample data — no LinkedIn access required to get started)
+- **Import your real posts** from your own LinkedIn data export or a JSON file — no LinkedIn API access required, since LinkedIn currently isn't granting any (bundled sample data is also included, for trying the site before importing anything)
+- **Nightly sync** from LinkedIn via the official OAuth API, for the rare fork where that access exists or is reopened in the future
 - **Automatic categorization** from a fully configurable keyword/hashtag ruleset
 - **Client-side full-text search** — no server, works on category/tag/year filters, ranked by relevance or date
 - Home, About, Posts archive, individual post pages, Categories, Tags, Year/Month archive
@@ -101,33 +111,60 @@ categories:
 
 Full reference: [`docs/configuration.md`](docs/configuration.md).
 
-## Local development
+## Local development and testing
+
+**Preview the site with whatever content is currently in `content/posts/`** (sample data on a fresh clone, or your imported posts after the step above):
 
 ```bash
-uv sync                          # install dependencies
-uv run linkedin-archive build    # generate dist/ from content/
-uv run linkedin-archive serve    # build + serve dist/ locally
-uv run linkedin-archive validate # check content and config for problems
-uv run linkedin-archive stats    # archive statistics
+uv sync                          # install dependencies (once, or after pulling dependency changes)
+uv run linkedin-archive build    # generate dist/ from content/ + config.yaml
+uv run linkedin-archive serve    # build + serve dist/ locally, prints the URL (typically http://127.0.0.1:8000/)
+```
+
+Open the printed URL in a browser and click around — home page, an individual post, `/search/`, `/about/`, dark/light toggle. `serve` rebuilds are not automatic; re-run it (or just `build` again, if `serve` is still running in another terminal — it serves whatever's currently in `dist/`) after changing `content/`, `config.yaml`, or anything under `app/site/`.
+
+**Before trusting or pushing any change**, whether it's new content or a code change:
+
+```bash
+uv run linkedin-archive validate # checks content and config for problems: malformed posts, duplicate ids, unknown categories, broken internal links
+```
+
+**If you changed application code** under `app/` (as opposed to just content or config), also run the same checks CI runs:
+
+```bash
 uv run pytest                    # run the test suite
 uv run ruff check .              # lint
 uv run ruff format --check .     # formatting
 uv run mypy .                    # type-check
 ```
 
+`uv run linkedin-archive stats` prints a quick summary (post count, categories, date range) if you just want a sanity check that an import did what you expected without opening a browser.
+
 ## Importing existing posts
 
-This is the primary way to populate a fork with real content — see [LinkedIn API setup](#linkedin-api-setup) below for why the `linkedin` provider isn't a realistic option right now. Two ways in, neither needs any LinkedIn API access:
+This is the primary way to populate a fork with real content — see [LinkedIn API setup](#linkedin-api-setup) below for why the `linkedin` provider isn't a realistic option right now. Two ways in, neither needs any LinkedIn API access.
 
-**From LinkedIn's own data export (recommended)** — Settings & Privacy → Data privacy → **Get a copy of your data** → check **Posts** (and, separately, **Profile** if you also want the About page filled in — see below). LinkedIn emails a zip; unzip it, then:
+### From LinkedIn's own data export (recommended)
+
+**Step 1 — request the export, on linkedin.com (not this repo):**
+
+1. Click your profile photo → **Settings & Privacy**.
+2. **Data privacy** (left sidebar) → **Get a copy of your data**.
+3. Select **"Want something in particular? Select the data files you're most interested in."**
+4. Check **Posts** (your post history). Also check **Profile** if you want [the About page filled in automatically](#populating-the-about-page-from-your-linkedin-profile) too — it costs nothing extra to request both at once.
+5. Click **Request archive**. LinkedIn emails you a download link — usually within a few minutes, occasionally up to a day.
+6. Click the link in that email and download the `.zip` file (e.g. `Basic_LinkedInDataExport_MM-DD-YYYY.zip` or `Complete_LinkedInDataExport_MM-DD-YYYY.zip`).
+7. Unzip it. On macOS/most browsers this happens automatically; otherwise `unzip Basic_LinkedInDataExport_*.zip -d linkedin-export`. Note the folder path — you'll pass it to the CLI next.
+
+**Step 2 — import it, from your cloned fork:**
 
 ```bash
 uv run linkedin-archive import-export path/to/unzipped-export/
 ```
 
-This finds and reads your posts CSV directly (named `Shares.csv` or `Shares_<a long number>.csv`, depending on which export you requested). See [`docs/providers.md`](docs/providers.md) for details and troubleshooting.
+This finds and reads your posts CSV directly — named `Shares.csv` in some export variants, `Shares_<a long member id number>.csv` in others; the command locates either. It's safe to re-run any time you request a fresh export: posts are matched by their LinkedIn id, so re-importing never creates duplicates, and a post that no longer appears in a newer export is left alone rather than deleted (`sync.preserve_deleted` in `config.yaml`). See [`docs/providers.md`](docs/providers.md) for details and troubleshooting (e.g. what happens if the CSV's columns don't match what's expected).
 
-**From a hand-written JSON file:**
+### From a hand-written JSON file
 
 ```bash
 uv run linkedin-archive import posts.json
@@ -185,7 +222,7 @@ uv run linkedin-archive sync --provider linkedin
 
 Two workflows, one job each:
 
-- **`.github/workflows/sync.yml`** — nightly (`workflow_dispatch` also supported), fetches new posts and commits changes to `content/`.
+- **`.github/workflows/sync.yml`** — nightly (`workflow_dispatch` also supported), fetches new posts and commits changes to `content/`. Only does anything useful if `sync.provider: linkedin` *and* you have working LinkedIn API access — neither is the default, since that access [currently isn't obtainable](#linkedin-api-setup) for a new fork. Most forks can ignore this workflow entirely and just re-run `import-export`/`import` locally + push when they have new posts.
 - **`.github/workflows/deploy.yml`** — on push to `content/`, `static/`, `app/site/`, or `config.yaml`, builds the site and publishes it to GitHub Pages via the Pages deployment API (no `dist/` is ever committed to git).
 
 `deploy.yml` needs no secrets at all. `sync.yml` needs the repository secrets described in [LinkedIn API setup](#linkedin-api-setup) only if `sync.provider: linkedin` — which, per that section, isn't currently a realistic setting for a new fork. For `linkedin_export`/`import` content, re-run the relevant `import-*` command locally and push; there's nothing for `sync.yml` to do.
@@ -198,11 +235,40 @@ Two workflows, one job each:
 
 ### Custom domains
 
-1. **Settings → Pages → Custom domain**, enter your domain, save. This is a repository setting that applies to every future deploy automatically — no `CNAME` file needed anywhere in the repo (`deploy.yml` publishes via `actions/deploy-pages`, which ignores one).
-2. Point your domain's DNS at GitHub Pages (an `A`/`AAAA` record set, or a `CNAME` record for a subdomain).
-3. Update `site.url` in `config.yaml` to your domain.
+**Step 1 — tell GitHub the domain, in your fork's repo settings (not your DNS provider yet):**
 
-Full step-by-step instructions (registrar screenshots-in-words, DNS record values, HTTPS): [`docs/setup-guide.html`](docs/setup-guide.html) and [`docs/deployment.md`](docs/deployment.md).
+Repo **Settings → Pages → Custom domain**, enter `your-domain.com` or `archive.your-domain.com`, click **Save**. This is a repository setting that applies to every future deploy automatically — no `CNAME` file needed anywhere in the repo (`deploy.yml` publishes via `actions/deploy-pages`, which ignores one even if present).
+
+**Step 2 — add the DNS record, at your domain registrar/DNS provider (Namecheap, GoDaddy, Cloudflare, Google Domains/Squarespace, etc.), not GitHub:**
+
+| If using | Record type | Host / Name | Value |
+|---|---|---|---|
+| Subdomain (`archive.your-domain.com`) | `CNAME` | `archive` | `<your-github-username>.github.io` |
+| Apex domain (`your-domain.com`) | `A` (add all four) | `@` | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
+| Apex domain, IPv6 (optional) | `AAAA` (add all four) | `@` | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
+
+The `CNAME` target is always `<username>.github.io` — GitHub routes by the custom domain registered in Step 1, not by which repo that hostname happens to name, so this is correct even if you also separately own a `<username>.github.io` repo. DNS propagation is typically minutes, occasionally a few hours.
+
+**Step 3 — update the site config, back in your cloned fork:**
+
+```bash
+# config.yaml
+site:
+  url: "https://your-domain.com"   # or https://archive.your-domain.com
+```
+
+Commit and push — this triggers *Deploy site* automatically and republishes with the corrected canonical URLs, sitemap, and RSS feed.
+
+**Step 4 — verify it's actually live:**
+
+```bash
+dig +short CNAME archive.your-domain.com        # should print <your-github-username>.github.io.
+curl -sI https://your-domain.com/ | head -1      # should print "HTTP/2 200"
+```
+
+Also check repo **Settings → Pages** in the browser: once GitHub verifies the DNS record it issues an HTTPS certificate automatically (can take a few minutes to a few hours after DNS is correct) — revisit that page and check **Enforce HTTPS** once it's no longer greyed out. Until DNS resolves, `dig` prints nothing and `curl` will fail to connect or time out — that's expected, not an error, while waiting on propagation.
+
+Full step-by-step instructions (registrar screenshots-in-words, HTTPS troubleshooting): [`docs/setup-guide.html`](docs/setup-guide.html) and [`docs/deployment.md`](docs/deployment.md).
 
 ## Categorization
 
