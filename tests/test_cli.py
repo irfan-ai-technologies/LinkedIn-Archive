@@ -88,6 +88,55 @@ def test_import_missing_file_returns_nonzero(tmp_path: Path) -> None:
     assert result.exit_code != 0
 
 
+def test_import_export_command(tmp_path: Path, fixtures_dir: Path) -> None:
+    config_path = _write_config(tmp_path)
+    result = runner.invoke(
+        app,
+        [
+            "import-export",
+            str(fixtures_dir / "linkedin_export"),
+            "--config",
+            str(config_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "New:" in result.output
+    assert (tmp_path / "dist" / "index.html").exists()
+
+
+def test_import_export_missing_dir_returns_nonzero(tmp_path: Path) -> None:
+    config_path = _write_config(tmp_path)
+    result = runner.invoke(
+        app, ["import-export", str(tmp_path / "no-such-export"), "--config", str(config_path)]
+    )
+    assert result.exit_code != 0
+
+
+def test_import_profile_command(tmp_path: Path, fixtures_dir: Path) -> None:
+    config_path = _write_config(tmp_path)
+    result = runner.invoke(
+        app,
+        [
+            "import-profile",
+            str(fixtures_dir / "linkedin_export" / "Profile.csv"),
+            "--config",
+            str(config_path),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    profile_yaml = (tmp_path / "content" / "profile" / "profile.yaml").read_text(encoding="utf-8")
+    assert "Jane Doe" in profile_yaml
+    assert "San Francisco Bay Area" in profile_yaml
+
+
+def test_import_profile_missing_file_returns_nonzero(tmp_path: Path) -> None:
+    config_path = _write_config(tmp_path)
+    result = runner.invoke(
+        app, ["import-profile", "does-not-exist.csv", "--config", str(config_path)]
+    )
+    assert result.exit_code != 0
+
+
 def test_auth_login_requires_credentials(tmp_path: Path) -> None:
     config_path = _write_config(tmp_path)
     result = runner.invoke(app, ["auth", "login", "--config", str(config_path)])

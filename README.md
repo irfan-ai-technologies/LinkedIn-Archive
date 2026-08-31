@@ -31,27 +31,28 @@ It's built to be **forked**, not just run. Every fork owner configures their own
 ## Architecture
 
 ```
-LinkedIn API ──┐
-JSON import ───┼──▶ ContentProvider ──▶ RawPost ──▶ enrichment ──▶ Post ──▶ content/posts/*.md
-Sample data ───┘         (ingestion)                (categorize,           (Markdown + YAML
-                                                       word count,           front matter)
-                                                       excerpt)                    │
-                                                                                    ▼
-                                                                          static site generator
-                                                                        (Jinja2 + search index)
-                                                                                    │
-                                                                                    ▼
-                                                                                 dist/
-                                                                                    │
-                                                                                    ▼
-                                                                        GitHub Pages / any host
+LinkedIn API ────────────┐
+LinkedIn data export ────┤
+JSON import ─────────────┼──▶ ContentProvider ──▶ RawPost ──▶ enrichment ──▶ Post ──▶ content/posts/*.md
+Sample data ─────────────┘    (ingestion)                     (categorize,            (Markdown + YAML
+                                                              word count,             front matter)
+                                                              excerpt)                                    │
+                                                                                                          ▼
+                                                                                                static site generator
+                                                                                               (Jinja2 + search index)
+                                                                                                          │
+                                                                                                          ▼
+                                                                                                          dist/
+                                                                                                          │
+                                                                                                          ▼
+                                                                                               GitHub Pages / any host
 ```
 
 Each layer only depends on the one below it through a narrow interface:
 
 | Layer | Responsibility | Knows about LinkedIn? |
 |---|---|---|
-| `app/ingestion/` | Fetch raw posts from a source, normalize into `RawPost` | Only `linkedin.py` / `linkedin_oauth.py` |
+| `app/ingestion/` | Fetch raw posts from a source, normalize into `RawPost` | Only `linkedin.py` / `linkedin_oauth.py` / `linkedin_export.py` / `linkedin_profile_import.py` |
 | `app/enrichment/` | Categorize, tag, compute word count/reading time/excerpt | No |
 | `app/storage/` | Read/write posts as Markdown + YAML front matter | No |
 | `app/search/` | Build the compact client-side search index | No |
@@ -104,9 +105,9 @@ Full reference: [`docs/configuration.md`](docs/configuration.md).
 
 ## LinkedIn API setup
 
-Reading a member's own posts requires LinkedIn's **restricted member-social-read permissions** (e.g. `r_member_social`), which require LinkedIn's app review/approval — this is not optional and cannot be bypassed. **This project never scrapes LinkedIn, never automates a browser, and never stores your LinkedIn password.** It uses LinkedIn's official OAuth 2.0 authorization code flow only.
+Reading a member's own posts requires LinkedIn's **restricted member-social-read permissions** (e.g. `r_member_social`), which require LinkedIn's app review/approval — this is not optional and cannot be bypassed. As of this writing, LinkedIn is not accepting new access requests for this permission at all. **This project never scrapes LinkedIn, never automates a browser, and never stores your LinkedIn password.** It uses LinkedIn's official OAuth 2.0 authorization code flow only.
 
-Until your app is approved, use the **sample** provider (default) or the **import** provider — both are fully functional and required no LinkedIn access.
+Until your app is approved (or in place of it, since approval isn't currently obtainable), use the **sample** provider (default), the **linkedin_export** provider (reads LinkedIn's own "Download my data" export — see below), or the **import** provider — all three are fully functional and require no LinkedIn API access.
 
 Full walkthrough, required scopes, and troubleshooting: [`docs/linkedin-api.md`](docs/linkedin-api.md).
 
@@ -135,7 +136,17 @@ uv run mypy .                    # type-check
 
 ## Importing existing posts
 
-No LinkedIn API access? Import posts directly:
+No LinkedIn API access? Two ways in, no API needed for either:
+
+**From LinkedIn's own data export** — Settings & Privacy → Data privacy → **Get a copy of your data** → check **Posts** (and, separately, **Profile** if you also want the About page filled in — see below). LinkedIn emails a zip; unzip it, then:
+
+```bash
+uv run linkedin-archive import-export path/to/unzipped-export/
+```
+
+This reads `Shares.csv` directly. See [`docs/providers.md`](docs/providers.md) for details and troubleshooting.
+
+**From a hand-written JSON file:**
 
 ```bash
 uv run linkedin-archive import posts.json
@@ -155,7 +166,17 @@ uv run linkedin-archive import posts.json
 }
 ```
 
-Imported posts flow through the exact same normalization, categorization, and storage pipeline as the LinkedIn provider — there is no second-class path. See [`docs/providers.md`](docs/providers.md) for the full schema.
+Either way, imported posts flow through the exact same normalization, categorization, and storage pipeline as the LinkedIn provider — there is no second-class path. See [`docs/providers.md`](docs/providers.md) for the full schema.
+
+## Populating the About page from your LinkedIn profile
+
+If you requested **Profile** in your LinkedIn data export above, `Profile.csv` sits alongside `Shares.csv` in the same unzipped folder:
+
+```bash
+uv run linkedin-archive import-profile path/to/unzipped-export/Profile.csv
+```
+
+This fills in `name`, `headline`, `bio`, and `location` in `content/profile/profile.yaml` — the file that drives both the About page and the home page bio. It never touches `avatar` or `links` (LinkedIn/GitHub/website/email), since the export has no equivalent data for those; edit them by hand in `content/profile/profile.yaml`.
 
 ## GitHub Actions
 

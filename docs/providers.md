@@ -17,7 +17,46 @@ Nothing outside `app/ingestion/` depends on a concrete provider — the sync eng
 |---|---|---|
 | `sample` | `app/ingestion/sample.py` | No — bundled fictional posts, used for demos, development, and CI |
 | `import` | `app/ingestion/json_import.py` | No — reads a local JSON file |
+| `linkedin_export` | `app/ingestion/linkedin_export.py` | No — reads LinkedIn's own personal data export |
 | `linkedin` | `app/ingestion/linkedin.py` + `linkedin_oauth.py` | Yes — see [`linkedin-api.md`](linkedin-api.md) |
+
+## Importing from LinkedIn's own data export
+
+As of this writing, LinkedIn is not accepting new access requests for the `r_member_social`
+scope the `linkedin` provider needs — its own Marketing API FAQ calls the permission "closed...
+due to resource constraints." Until that changes, the `linkedin_export` provider is the way to
+populate a fork from your real post history:
+
+1. On LinkedIn: Settings & Privacy → Data privacy → **Get a copy of your data** → select **Posts**
+   (for your posts) and, separately, **Profile** (for the About page — see below). LinkedIn emails
+   you a zip within a few minutes to a day.
+2. Unzip it. Somewhere inside is `Shares.csv` (your posts) and `Profile.csv` (your profile fields).
+3. Run:
+
+   ```bash
+   uv run linkedin-archive import-export path/to/unzipped-export/
+   ```
+
+This reads `Shares.csv` directly — no conversion step needed. Column names have varied across
+LinkedIn's export format revisions, so lookups are case/punctuation-insensitive against a list of
+known aliases; if `Shares.csv`'s headers don't match any known alias, the command fails with the
+headers it actually found so the aliases in `app/ingestion/linkedin_export.py` can be extended.
+
+A bare repost (no commentary, nothing shared) has nothing to archive and is skipped. A row whose
+date can't be parsed is skipped too, rather than failing the whole import.
+
+This is not scraping — it's reading a file LinkedIn generated and handed directly to you.
+
+### Populating the About page from `Profile.csv`
+
+```bash
+uv run linkedin-archive import-profile path/to/unzipped-export/Profile.csv
+```
+
+This updates `name`, `headline`, `bio`, and `location` in `content/profile/profile.yaml` (which
+already drives the About page and home page bio — see `app/storage/profile_store.py`) from the
+matching columns in `Profile.csv`. Fields the export has no equivalent for — `avatar` and
+`links` (LinkedIn/GitHub/website/email) — are always left as they were; edit those by hand.
 
 ## The JSON import format
 

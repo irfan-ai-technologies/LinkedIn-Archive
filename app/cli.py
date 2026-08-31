@@ -9,7 +9,7 @@ from pathlib import Path
 import typer
 
 from app.config import AppConfig, load_config
-from app.ingestion import ProviderError, get_provider, import_provider
+from app.ingestion import ProviderError, get_provider, import_provider, linkedin_export_provider
 from app.site.devserver import serve_directory
 from app.site.generator import build_site
 from app.stats import compute_stats
@@ -87,6 +87,56 @@ def import_command(
 
     build_site(config)
     typer.echo("\nStatic site generated successfully.")
+
+
+@app.command(name="import-export")
+def import_export_command(
+    export_dir: Path = typer.Argument(
+        ..., help="Path to an extracted LinkedIn 'Download my data' export (contains Shares.csv)."
+    ),
+    author: str = typer.Option(None, "--author", help="Default author for posts missing one."),
+    config_path: Path | None = _config_option,
+) -> None:
+    """Import posts from LinkedIn's own data export — no API access required."""
+    config = _load(config_path)
+    provider = linkedin_export_provider(
+        export_dir, default_author=author or config.user.site.author
+    )
+
+    try:
+        result = run_sync(provider, config)
+    except ProviderError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+
+    typer.echo(result.summary_text())
+    if result.failed and result.fetched == 0:
+        raise typer.Exit(code=1)
+
+    build_site(config)
+    typer.echo("\nStatic site generated successfully.")
+
+
+@app.command(name="import-profile")
+def import_profile_command(
+    file: Path = typer.Argument(..., help="Path to Profile.csv from a LinkedIn data export."),
+    config_path: Path | None = _config_option,
+) -> None:
+    """Populate content/profile/profile.yaml (the About page) from a LinkedIn Profile.csv export."""
+    from app.ingestion.linkedin_profile_import import merge_profile, parse_profile_csv
+    from app.storage.profile_store import load_profile, save_profile
+
+    config = _load(config_path)
+    try:
+        parsed = parse_profile_csv(file)
+    except ProviderError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+
+    existing = load_profile(config.profile_path)
+    merged = merge_profile(existing, parsed)
+    save_profile(config.profile_path, merged)
+    typer.echo(f"Updated {config.profile_path} from {file}")
 
 
 @app.command()
