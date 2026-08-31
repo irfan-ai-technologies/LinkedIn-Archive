@@ -1,26 +1,26 @@
-# =============================================================================
-# LinkedIn Archive — profile
-# =============================================================================
-# Rendered on the home page and the About page. Edit freely; this file
-# contains no secrets and no application code.
-# =============================================================================
-
-name: "Sheik Irfan Basha"
-headline: "TODO — replace with your professional headline"
-location: ""
-
-bio: |
-  TODO — replace with a couple of paragraphs about yourself. Supports
-  Markdown, and appears on both the home page and the About page.
-
-  Once you have a LinkedIn data export (see docs/providers.md), running
-  `uv run linkedin-archive import-profile <path to Profile.csv>` fills in
-  headline/bio/location here automatically from your real LinkedIn profile.
-
+name: Sheik Irfan Basha
+headline: Building Enterprise AI Systems & Agentic Workflows | Head of AI Research
+  @ ABAI | Co-Founder @ NGI Academy
+bio: Irfan Basha is an Applied AI Engineer specializing in building production-ready
+  AI systems that solve complex enterprise problems. His expertise lies in taking
+  Generative AI beyond prototypes by engineering reliable, controllable, and observable
+  AI solutions that integrate seamlessly into real business workflows. His work spans
+  Agentic AI, Retrieval-Augmented Generation (RAG), LLM orchestration, evaluation
+  frameworks (Evals), AI observability, recommendation systems, and enterprise integrations.He
+  currently leads the design and development of AI capabilities for enterprise workforce
+  management, building intelligent systems for scheduling optimization, shift replacement,
+  and employee recommendations. By combining LLMs with deterministic business logic,
+  enterprise APIs, and production engineering practices, he has delivered AI solutions
+  that automate critical operational workflows while maintaining reliability, explainability,
+  and measurable business value.With a strong foundation in AI systems engineering
+  and backend architecture, Irfan enjoys solving the challenges that make AI successful
+  in production, from orchestration and context engineering to guardrails, observability,
+  and continuous evaluation. His passion is building AI systems that customers can
+  trust and organizations can confidently deploy at scale.
 avatar: null
-
+location: Chennai, Tamil Nadu, India
 links:
-  linkedin: "https://www.linkedin.com/in/sheikirfanbasha/"
-  github: "https://github.com/sheikirfanbasha"
-  website: ""
-  email: ""
+  linkedin: https://www.linkedin.com/in/sheikirfanbasha/
+  github: https://github.com/sheikirfanbasha
+  website: ''
+  email: ''
