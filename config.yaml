@@ -8,18 +8,18 @@
 # =============================================================================
 
 site:
-  title: "My LinkedIn Archive"
+  title: "Sheik Irfan Basha"
   description: "A searchable archive of my LinkedIn posts and ideas."
-  author: "Your Name"
+  author: "Sheik Irfan Basha"
   # Public base URL of the deployed site, no trailing slash.
   # Used to build canonical URLs, the sitemap, and the RSS feed.
-  url: "https://irfan-ai-technologies.github.io/LinkedIn-Archive"
-  linkedin_url: "https://www.linkedin.com/in/example"
+  url: "https://sheikirfanbasha.familyos4u.com"
+  linkedin_url: "https://www.linkedin.com/in/sheikirfanbasha/"
   language: "en"
   timezone: "UTC"
   # Optional social/profile links shown in the site footer.
   links:
-    github: ""
+    github: "https://github.com/sheikirfanbasha"
     website: ""
     email: ""
 

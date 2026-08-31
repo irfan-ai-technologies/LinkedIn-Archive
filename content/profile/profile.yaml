@@ -5,22 +5,22 @@
 # contains no secrets and no application code.
 # =============================================================================
 
-name: "Jordan Rivera"
-headline: "Software architect writing about agentic AI, engineering, and leadership."
-location: "Remote"
+name: "Sheik Irfan Basha"
+headline: "TODO — replace with your professional headline"
+location: ""
 
 bio: |
-  I write about the practical side of building software with AI: agentic
-  systems in production, the engineering habits that scale teams, and the
-  leadership lessons that don't show up in a job title.
+  TODO — replace with a couple of paragraphs about yourself. Supports
+  Markdown, and appears on both the home page and the About page.
 
-  This archive mirrors what I post on LinkedIn — normalized, organized, and
-  fully searchable, without needing to scroll a feed to find it again.
+  Once you have a LinkedIn data export (see docs/providers.md), running
+  `uv run linkedin-archive import-profile <path to Profile.csv>` fills in
+  headline/bio/location here automatically from your real LinkedIn profile.
 
 avatar: null
 
 links:
-  linkedin: "https://www.linkedin.com/in/example"
-  github: "https://github.com/example"
+  linkedin: "https://www.linkedin.com/in/sheikirfanbasha/"
+  github: "https://github.com/sheikirfanbasha"
   website: ""
   email: ""
