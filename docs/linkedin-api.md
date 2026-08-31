@@ -1,12 +1,23 @@
 # LinkedIn API setup
 
-LinkedIn Archive integrates with LinkedIn **only** through LinkedIn's official OAuth 2.0 API. It does not scrape LinkedIn, does not automate a browser, and does not store your LinkedIn password. If you don't want to deal with LinkedIn's app-review process right now, skip straight to using the `sample` or `import` provider — the rest of the product works identically either way.
+> **This path is not currently usable for a new fork.** Reading a member's own posts requires
+> LinkedIn's `r_member_social` scope, and LinkedIn's own Marketing API FAQ describes that
+> permission as "closed... [not] accepting access requests... due to resource constraints." That's
+> not a review queue you can wait out — it's closed to new applicants, full stop, as of this
+> writing. **Use the `linkedin_export` provider instead** (`linkedin-archive import-export
+> <unzipped export dir>`, reading LinkedIn's own "Download my data" export) — see
+> [`providers.md`](providers.md) for the full walkthrough. It gets you the same posts, requires no
+> approval from anyone, and is the primary way this project expects most forks to get real content
+> in today. This page is kept for reference (in case LinkedIn reopens the permission) and because
+> the same OAuth flow also covers basic sign-in scopes.
+
+LinkedIn Archive integrates with LinkedIn **only** through LinkedIn's official OAuth 2.0 API. It does not scrape LinkedIn, does not automate a browser, and does not store your LinkedIn password.
 
 ## The permission LinkedIn requires
 
 Reading a member's own posts requires LinkedIn's **member-social-read** permissions (for example, the `r_member_social` scope), which are part of a **restricted product** on LinkedIn's developer platform. Restricted products require LinkedIn to review and approve your application before the scope is usable — this is a policy on LinkedIn's side, not a limitation of this project, and there is no way around it. Approval timelines and requirements are set by LinkedIn and can change; always check LinkedIn's current developer documentation rather than relying solely on this file.
 
-Until approval is granted, any sync attempt against the `linkedin` provider will fail with a clear `403 Forbidden` error rather than silently doing something else.
+Until approval is granted — which, again, LinkedIn is not currently granting to new applicants at all — any sync attempt against the `linkedin` provider will fail with a clear `403 Forbidden` error rather than silently doing something else.
 
 ## Step 1 — create a LinkedIn app
 

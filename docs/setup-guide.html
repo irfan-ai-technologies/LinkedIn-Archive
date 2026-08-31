@@ -182,9 +182,9 @@
     <li><a href="#configure">Configure your site</a></li>
     <li><a href="#profile">Set up your profile / About page</a></li>
     <li><a href="#content">Get your LinkedIn posts in — three options</a></li>
-    <li><a href="#linkedin-app">Option A: connect the LinkedIn API</a></li>
-    <li><a href="#linkedin-export">Option B: import LinkedIn's own data export</a></li>
-    <li><a href="#import-json">Option C: import posts as JSON</a></li>
+    <li><a href="#linkedin-export">Option A: import LinkedIn's own data export</a></li>
+    <li><a href="#import-json">Option B: import posts as JSON</a></li>
+    <li><a href="#linkedin-app">Option C: connect the LinkedIn API (reference only)</a></li>
     <li><a href="#push">Push your changes to GitHub</a></li>
     <li><a href="#pages">Enable GitHub Pages</a></li>
     <li><a href="#domain">Point your own domain at the site</a></li>
@@ -260,7 +260,7 @@ links:
   <p>If you want an avatar image, add the image file under <code class="path">static/images/</code> and reference it as <code>/static/images/your-file.jpg</code>.</p>
   <div class="callout">
     <strong class="label">Prefer to fill this in from LinkedIn directly?</strong>
-    <p>If you request the <strong>Profile</strong> file in step 7's LinkedIn data export, <code>linkedin-archive import-profile</code> fills in <code>name</code>, <code>headline</code>, <code>bio</code>, and <code>location</code> here automatically — <code>avatar</code> and <code>links</code> still need to be set by hand either way.</p>
+    <p>If you request the <strong>Profile</strong> file in step 6's LinkedIn data export, <code>linkedin-archive import-profile</code> fills in <code>name</code>, <code>headline</code>, <code>bio</code>, and <code>location</code> here automatically — <code>avatar</code> and <code>links</code> still need to be set by hand either way.</p>
   </div>
 </section>
 
@@ -268,106 +268,48 @@ links:
   <h2><span class="num">5</span> Get your LinkedIn posts in — three options</h2>
   <p>You have three ways to populate the archive with your real posts. You do not need to pick immediately — the site works with the bundled sample content in the meantime, and you can switch later.</p>
   <table>
-    <tr><th>Option</th><th>Needs LinkedIn API approval?</th><th>Effort</th><th>Keeps updating automatically?</th></tr>
-    <tr><td><strong>A. LinkedIn API</strong></td><td>Yes — and LinkedIn is not currently accepting new member-social-read access requests at all</td><td>Higher, one-time setup</td><td>Yes, nightly via GitHub Actions</td></tr>
-    <tr><td><strong>B. LinkedIn data export</strong></td><td>No</td><td>Low — request an export from LinkedIn, unzip it, run one command</td><td>No — re-run manually whenever you request a new export</td></tr>
-    <tr><td><strong>C. JSON import</strong></td><td>No</td><td>Low — you provide a JSON file</td><td>No — re-run manually whenever you have new posts</td></tr>
+    <tr><th>Option</th><th>Usable today?</th><th>Effort</th><th>Keeps updating automatically?</th></tr>
+    <tr><td><strong>A. LinkedIn data export</strong></td><td>Yes</td><td>Low — request an export from LinkedIn, unzip it, run one command</td><td>No — re-run manually whenever you request a new export</td></tr>
+    <tr><td><strong>B. JSON import</strong></td><td>Yes</td><td>Low — you provide a JSON file</td><td>No — re-run manually whenever you have new posts</td></tr>
+    <tr><td><strong>C. LinkedIn API</strong></td><td>No — LinkedIn is not currently accepting new member-social-read access requests at all</td><td>Higher, one-time setup</td><td>Yes, nightly via GitHub Actions (if it ever becomes usable again)</td></tr>
   </table>
   <div class="callout ok">
-    <strong class="label">Recommended starting point</strong>
-    <p>Option B (LinkedIn data export) is the most reliable way to get your real post history in today — Option A's <code>r_member_social</code> permission is closed to new applicants as of this writing, and Option B needs no manual copy-pasting the way Option C does.</p>
+    <strong class="label">Start with Option A</strong>
+    <p>It's the most reliable way to get your real post history in today: no manual copy-pasting like Option B, and no waiting on Option C's <code>r_member_social</code> permission, which LinkedIn is currently closed to new applicants for — not a queue, a dead end, at least for now. Option C is documented for completeness and in case LinkedIn reopens it, not because it's a viable starting point right now.</p>
   </div>
-  <p>Continue to step 6 for Option A, skip to step 7 for Option B, or skip to step 8 for Option C.</p>
-</section>
-
-<section class="step" id="linkedin-app">
-  <h2><span class="num">6</span> Option A: connect the LinkedIn API</h2>
-  <p>LinkedIn requires its own review/approval before any app can read a member's own posts (the <code>r_member_social</code> scope, part of a restricted product). This is LinkedIn's policy, not something this project can bypass — and this project never scrapes LinkedIn or stores your password as a workaround.</p>
-  <div class="callout warn">
-    <strong class="label">Currently closed to new applicants</strong>
-    <p>As of this writing, LinkedIn's own Marketing API FAQ describes <code>r_member_social</code> as "closed... [not] accepting access requests... due to resource constraints." You can still fill out the request in step 6.1.4 below in case that changes, but for posts today, use <a href="#linkedin-export">Option B</a> instead.</p>
-  </div>
-
-  <h3>6.1 Create a LinkedIn developer app</h3>
-  <ol>
-    <li>Go to LinkedIn's developer portal and create a new app. LinkedIn requires the app to be linked to a Company Page you administer — create a minimal one if you don't have one already.</li>
-    <li>In the app's <strong>Auth</strong> tab, copy the <strong>Client ID</strong> and <strong>Client Secret</strong> — you'll need both shortly.</li>
-    <li>Under <strong>Authorized redirect URLs for your app</strong>, add:
-      <pre><code>http://localhost:8765/callback</code></pre>
-      This is only used for the one-time interactive login on your own machine.
-    </li>
-    <li>Under the app's <strong>Products</strong> tab, request the product that grants member-social-read permissions. Fill in whatever LinkedIn's review form asks for and submit. <strong>Approval is LinkedIn's process and timeline</strong> — this can take time. You can continue every other step of this guide while waiting.</li>
-  </ol>
-
-  <h3>6.2 Set your local secrets</h3>
-<pre><code>cp .env.example .env</code></pre>
-  <p>Open <code>.env</code> and fill in:</p>
-<pre><code>LINKEDIN_CLIENT_ID=&lt;your client id&gt;
-LINKEDIN_CLIENT_SECRET=&lt;your client secret&gt;
-LINKEDIN_REDIRECT_URI=http://localhost:8765/callback</code></pre>
-  <div class="callout warn">
-    <strong class="label">Never commit this file</strong>
-    <p><code>.env</code> is already listed in <code>.gitignore</code>. Double-check <code>git status</code> never shows it before you push anything.</p>
-  </div>
-
-  <h3>6.3 Authorize once, locally</h3>
-<pre><code>uv run linkedin-archive auth login</code></pre>
-  <p>This opens your browser to LinkedIn's consent screen. Approve access, and you'll be redirected back to a small local page confirming success. The resulting token is saved to <code class="path">.secrets/linkedin_token.json</code> (also gitignored).</p>
-
-  <h3>6.4 Set <code>config.yaml</code> to use LinkedIn</h3>
-<pre><code>sync:
-  provider: linkedin</code></pre>
-
-  <h3>6.5 Try it locally</h3>
-<pre><code>uv run linkedin-archive sync
-uv run linkedin-archive serve</code></pre>
-  <p>If your app hasn't been approved yet, this will fail with a clear <code>403 Forbidden</code> message rather than doing anything unexpected — that's expected until LinkedIn approves your product request. Switch <code>sync.provider</code> back to <code>sample</code>, or use Option B or Option C below, in the meantime.</p>
-
-  <h3>6.6 Add the same secrets to GitHub, for automated nightly sync</h3>
-  <p>In your fork on GitHub: <strong>Settings → Secrets and variables → Actions → New repository secret</strong>. Add three secrets:</p>
-  <table>
-    <tr><th>Secret name</th><th>Value</th></tr>
-    <tr><td><code>LINKEDIN_CLIENT_ID</code></td><td>Same value as in your local <code>.env</code></td></tr>
-    <tr><td><code>LINKEDIN_CLIENT_SECRET</code></td><td>Same value as in your local <code>.env</code></td></tr>
-    <tr><td><code>LINKEDIN_TOKEN_JSON</code></td><td>The entire contents of your local <code class="path">.secrets/linkedin_token.json</code> file (open it, copy everything, paste as the secret value)</td></tr>
-  </table>
-  <div class="callout">
-    <strong class="label">Why paste a token instead of logging in from GitHub Actions</strong>
-    <p>The interactive OAuth flow needs a browser, which a GitHub Actions runner doesn't have. You authorize once on your own machine, then hand the resulting token to GitHub as a secret. If your app was also granted LinkedIn's <code>offline_access</code> product, the token refreshes itself automatically going forward.</p>
-  </div>
-  <p>Continue to step 9 (push your changes) — you can skip steps 7 and 8.</p>
+  <p>Continue to step 6 for Option A, skip to step 7 for Option B, or skip to step 8 for Option C (reference only).</p>
 </section>
 
 <section class="step" id="linkedin-export">
-  <h2><span class="num">7</span> Option B: import LinkedIn's own data export</h2>
-  <p>This reads the same posts as Option A, but from a file LinkedIn hands you directly instead of through an API that currently isn't approving new access. Nothing here scrapes LinkedIn or automates a browser — it only reads a file already sitting on your disk.</p>
+  <h2><span class="num">6</span> Option A: import LinkedIn's own data export</h2>
+  <p>This is the recommended path today: it reads your real posts from a file LinkedIn hands you directly, needs no approval from anyone, and sidesteps Option C's <code>r_member_social</code> permission entirely — the one LinkedIn currently isn't granting to new applicants at all (see step 8). Nothing here scrapes LinkedIn or automates a browser; it only reads a file already sitting on your disk.</p>
 
-  <h3>7.1 Request your data export</h3>
+  <h3>6.1 Request your data export</h3>
   <ol>
     <li>On LinkedIn: <strong>Settings &amp; Privacy → Data privacy → Get a copy of your data</strong>.</li>
     <li>Choose "Want something in particular? Select the data files you're most interested in", then check <strong>Posts</strong> (for your post history) and, if you also want step 4's About page filled in automatically, <strong>Profile</strong> too.</li>
     <li>Click <strong>Request archive</strong>. LinkedIn emails you a download link, usually within a few minutes to a day.</li>
-    <li>Download and unzip it. Inside you'll find <code>Shares.csv</code> (your posts) and, if you requested it, <code>Profile.csv</code>.</li>
+    <li>Download and unzip it. Inside you'll find a CSV named <code>Shares.csv</code> or <code>Shares_&lt;a long number&gt;.csv</code> (your posts) and, if you requested it, <code>Profile.csv</code>.</li>
   </ol>
 
-  <h3>7.2 Import your posts</h3>
+  <h3>6.2 Import your posts</h3>
 <pre><code>uv run linkedin-archive import-export path/to/unzipped-export/
 uv run linkedin-archive serve</code></pre>
-  <p>This reads <code>Shares.csv</code> directly — no conversion step needed. It's safe to re-run any time you request a fresh export; posts are matched by their LinkedIn activity id, so re-importing never creates duplicates.</p>
+  <p>This finds and reads your posts CSV directly — no conversion step needed. It's safe to re-run any time you request a fresh export; posts are matched by their LinkedIn id, so re-importing never creates duplicates.</p>
   <div class="callout">
-    <strong class="label">If it can't find or read Shares.csv</strong>
+    <strong class="label">If it can't find or read your posts CSV</strong>
     <p>The command reports the column headers it actually found, since LinkedIn's export format has changed over the years. See <a href="providers.md">docs/providers.md</a> for details.</p>
   </div>
 
-  <h3>7.3 Optional: fill in your About page from Profile.csv</h3>
+  <h3>6.3 Optional: fill in your About page from Profile.csv</h3>
 <pre><code>uv run linkedin-archive import-profile path/to/unzipped-export/Profile.csv</code></pre>
-  <p>This updates <code>name</code>, <code>headline</code>, <code>bio</code>, and <code>location</code> in <code class="path">content/profile/profile.yaml</code> from step 4. It never touches <code>avatar</code> or <code>links</code> — set those by hand, they have no equivalent in a LinkedIn export.</p>
+  <p>This updates <code>name</code>, <code>headline</code>, <code>bio</code>, and <code>location</code> in <code class="path">content/profile/profile.yaml</code> from step 4. It never touches <code>avatar</code> or <code>links</code> — set those by hand, they have no equivalent in a LinkedIn export. Double-check the imported <code>name</code> afterward: LinkedIn's First/Last Name fields don't always match the capitalization or order you'd actually want displayed.</p>
 
-  <p>Continue to step 9 (push your changes) — you can skip step 8.</p>
+  <p>Continue to step 9 (push your changes) — you can skip steps 7 and 8.</p>
 </section>
 
 <section class="step" id="import-json">
-  <h2><span class="num">8</span> Option C: import posts as JSON</h2>
+  <h2><span class="num">7</span> Option B: import posts as JSON</h2>
   <p>Collect your posts (copy them manually, export them, however you prefer) into a JSON file matching this format — save it anywhere, e.g. <code>my-posts.json</code>:</p>
 <pre><code>{
   "posts": [
@@ -384,6 +326,64 @@ uv run linkedin-archive serve</code></pre>
 <pre><code>uv run linkedin-archive import my-posts.json
 uv run linkedin-archive serve</code></pre>
   <p>This creates one Markdown file per post under <code class="path">content/posts/</code> and rebuilds the site. Re-run this command any time you have new posts to add — it's safe to run repeatedly (it won't create duplicates).</p>
+  <p>Continue to step 9 (push your changes) — you can skip step 8.</p>
+</section>
+
+<section class="step" id="linkedin-app">
+  <h2><span class="num">8</span> Option C: connect the LinkedIn API (reference only)</h2>
+  <div class="callout warn">
+    <strong class="label">Not usable for a new fork today</strong>
+    <p>As of this writing, LinkedIn's own Marketing API FAQ describes the <code>r_member_social</code> permission this option needs as "closed... [not] accepting access requests... due to resource constraints." This isn't a queue you can wait out — it's closed to new applicants, full stop. This section is kept for reference in case LinkedIn reopens it; for getting your posts in today, use <a href="#linkedin-export">Option A</a> instead.</p>
+  </div>
+  <p>LinkedIn requires its own review/approval before any app can read a member's own posts (the <code>r_member_social</code> scope, part of a restricted product). This is LinkedIn's policy, not something this project can bypass — and this project never scrapes LinkedIn or stores your password as a workaround.</p>
+
+  <h3>8.1 Create a LinkedIn developer app</h3>
+  <ol>
+    <li>Go to LinkedIn's developer portal and create a new app. LinkedIn requires the app to be linked to a Company Page you administer — create a minimal one if you don't have one already.</li>
+    <li>In the app's <strong>Auth</strong> tab, copy the <strong>Client ID</strong> and <strong>Client Secret</strong> — you'll need both shortly.</li>
+    <li>Under <strong>Authorized redirect URLs for your app</strong>, add:
+      <pre><code>http://localhost:8765/callback</code></pre>
+      This is only used for the one-time interactive login on your own machine.
+    </li>
+    <li>Under the app's <strong>Products</strong> tab, request the product that grants member-social-read permissions. Fill in whatever LinkedIn's review form asks for and submit — as of this writing this request goes nowhere (see the callout above), but the option is documented here in case that changes.</li>
+  </ol>
+
+  <h3>8.2 Set your local secrets</h3>
+<pre><code>cp .env.example .env</code></pre>
+  <p>Open <code>.env</code> and fill in:</p>
+<pre><code>LINKEDIN_CLIENT_ID=&lt;your client id&gt;
+LINKEDIN_CLIENT_SECRET=&lt;your client secret&gt;
+LINKEDIN_REDIRECT_URI=http://localhost:8765/callback</code></pre>
+  <div class="callout warn">
+    <strong class="label">Never commit this file</strong>
+    <p><code>.env</code> is already listed in <code>.gitignore</code>. Double-check <code>git status</code> never shows it before you push anything.</p>
+  </div>
+
+  <h3>8.3 Authorize once, locally</h3>
+<pre><code>uv run linkedin-archive auth login</code></pre>
+  <p>This opens your browser to LinkedIn's consent screen. Approve access, and you'll be redirected back to a small local page confirming success. The resulting token is saved to <code class="path">.secrets/linkedin_token.json</code> (also gitignored).</p>
+
+  <h3>8.4 Set <code>config.yaml</code> to use LinkedIn</h3>
+<pre><code>sync:
+  provider: linkedin</code></pre>
+
+  <h3>8.5 Try it locally</h3>
+<pre><code>uv run linkedin-archive sync
+uv run linkedin-archive serve</code></pre>
+  <p>Unless LinkedIn has approved your product request, this will fail with a clear <code>403 Forbidden</code> message rather than doing anything unexpected. Switch <code>sync.provider</code> back to <code>sample</code>, or use Option A or Option B above, in the meantime.</p>
+
+  <h3>8.6 Add the same secrets to GitHub, for automated nightly sync</h3>
+  <p>In your fork on GitHub: <strong>Settings → Secrets and variables → Actions → New repository secret</strong>. Add three secrets:</p>
+  <table>
+    <tr><th>Secret name</th><th>Value</th></tr>
+    <tr><td><code>LINKEDIN_CLIENT_ID</code></td><td>Same value as in your local <code>.env</code></td></tr>
+    <tr><td><code>LINKEDIN_CLIENT_SECRET</code></td><td>Same value as in your local <code>.env</code></td></tr>
+    <tr><td><code>LINKEDIN_TOKEN_JSON</code></td><td>The entire contents of your local <code class="path">.secrets/linkedin_token.json</code> file (open it, copy everything, paste as the secret value)</td></tr>
+  </table>
+  <div class="callout">
+    <strong class="label">Why paste a token instead of logging in from GitHub Actions</strong>
+    <p>The interactive OAuth flow needs a browser, which a GitHub Actions runner doesn't have. You authorize once on your own machine, then hand the resulting token to GitHub as a secret. If your app was also granted LinkedIn's <code>offline_access</code> product, the token refreshes itself automatically going forward.</p>
+  </div>
 </section>
 
 <section class="step" id="push">
@@ -449,9 +449,9 @@ git push</code></pre>
 
 <section class="step" id="nightly">
   <h2><span class="num">12</span> Turn on nightly sync (optional, LinkedIn API only)</h2>
-  <p>If you completed step 6, nothing else is needed — <code class="path">.github/workflows/sync.yml</code> is already scheduled to run nightly and will commit any new posts to <code>content/</code>, which in turn triggers <em>Deploy site</em> automatically.</p>
+  <p>If you completed step 8 (Option C, LinkedIn API), nothing else is needed — <code class="path">.github/workflows/sync.yml</code> is already scheduled to run nightly and will commit any new posts to <code>content/</code>, which in turn triggers <em>Deploy site</em> automatically.</p>
   <p>To change the schedule, edit the <code>cron</code> line in <code class="path">.github/workflows/sync.yml</code> (it uses standard 5-field cron syntax, evaluated in UTC). To trigger it manually at any time: <strong>Actions → Sync LinkedIn content → Run workflow</strong>.</p>
-  <p>If you're using Option B (data export) or Option C (JSON import) instead, there's nothing to schedule — just re-run the relevant import command and push whenever you have new posts.</p>
+  <p>If you're using Option A (data export) or Option B (JSON import) instead — the likely case, since Option C isn't currently obtainable for a new fork — there's nothing to schedule; just re-run the relevant import command and push whenever you have new posts.</p>
 </section>
 
 <section class="step" id="verify">
@@ -472,7 +472,7 @@ git push</code></pre>
   <table>
     <tr><th>Symptom</th><th>Likely fix</th></tr>
     <tr><td>Deploy workflow fails</td><td>Open the failed run's logs in the <strong>Actions</strong> tab — <code>linkedin-archive validate</code> runs first and will name the exact content problem.</td></tr>
-    <tr><td><code>sync</code> fails with 403 Forbidden</td><td>Your LinkedIn app hasn't been approved for member-social-read access yet (and, as of this writing, LinkedIn isn't approving new requests) — use Option B or Option C instead.</td></tr>
+    <tr><td><code>sync</code> fails with 403 Forbidden</td><td>Your LinkedIn app hasn't been approved for member-social-read access yet (and, as of this writing, LinkedIn isn't approving new requests at all) — use Option A or Option B instead.</td></tr>
     <tr><td><code>auth login</code> never redirects back</td><td><code>LINKEDIN_REDIRECT_URI</code> in <code>.env</code> must exactly match an Authorized redirect URL on your LinkedIn app, including the port.</td></tr>
     <tr><td><code>import-export</code> says <code>Shares.csv not found</code></td><td>Confirm you checked <strong>Posts</strong> when requesting your LinkedIn data export, and point the command at the unzipped folder, not the zip file itself.</td></tr>
     <tr><td><code>import-export</code> or <code>import-profile</code> reports unrecognized headers</td><td>LinkedIn's export column names have shifted over time; the error lists the headers actually found — see <a href="providers.md">docs/providers.md</a> to extend the recognized aliases.</td></tr>
