@@ -430,15 +430,12 @@ git push</code></pre>
   <h3>11.3 Tell GitHub about your domain</h3>
   <ol>
     <li>In your fork: <strong>Settings → Pages → Custom domain</strong>, enter <code>your-domain.com</code> or <code>archive.your-domain.com</code>, click <strong>Save</strong>.</li>
-    <li>Also add the domain directly to the repository so it survives rebuilds (GitHub's UI writes a <code>CNAME</code> file into the *deployed* output, but since this project rebuilds the site fresh every time rather than committing <code>dist/</code>, commit it yourself so every build includes it):</li>
-  </ol>
-<pre><code>echo "your-domain.com" &gt; static/CNAME
-git add static/CNAME
-git commit -m "Add custom domain"
-git push</code></pre>
-  <ol start="3">
     <li>Back in <strong>Settings → Pages</strong>, once GitHub verifies the DNS record, check <strong>Enforce HTTPS</strong> (it may be greyed out for a few minutes while GitHub issues a certificate — refresh the page after a bit).</li>
   </ol>
+  <div class="callout ok">
+    <strong class="label">That's it — no file to commit</strong>
+    <p>The custom domain is a repository setting, not something derived from what gets built, so it isn't affected by <code>dist/</code> being rebuilt from scratch every deploy — it just applies automatically to every future run. This project's <code>deploy.yml</code> publishes through <code>actions/deploy-pages</code>, which — unlike GitHub's older "deploy from a branch" source — ignores any <code>CNAME</code> file in the build output entirely and reads the domain purely from this setting. You don't need to add one to the repo, and a file dropped under <code>static/</code> wouldn't do anything here anyway (it would land at <code>dist/static/CNAME</code>, not <code>dist/CNAME</code>, since <code>static/</code> is copied wholesale into <code>dist/static/</code>).</p>
+  </div>
 
   <h3>11.4 Update your site configuration to match</h3>
   <p>Edit <code class="path">config.yaml</code>:</p>
@@ -479,7 +476,7 @@ git push</code></pre>
     <tr><td><code>auth login</code> never redirects back</td><td><code>LINKEDIN_REDIRECT_URI</code> in <code>.env</code> must exactly match an Authorized redirect URL on your LinkedIn app, including the port.</td></tr>
     <tr><td><code>import-export</code> says <code>Shares.csv not found</code></td><td>Confirm you checked <strong>Posts</strong> when requesting your LinkedIn data export, and point the command at the unzipped folder, not the zip file itself.</td></tr>
     <tr><td><code>import-export</code> or <code>import-profile</code> reports unrecognized headers</td><td>LinkedIn's export column names have shifted over time; the error lists the headers actually found — see <a href="providers.md">docs/providers.md</a> to extend the recognized aliases.</td></tr>
-    <tr><td>Pages shows 404 at your domain</td><td>Confirm DNS records match step 11.2 exactly, confirm <code>static/CNAME</code> contains only your domain with no <code>https://</code> prefix, and re-check <strong>Settings → Pages</strong> shows the domain as verified.</td></tr>
+    <tr><td>Pages shows 404 at your domain</td><td>Confirm DNS records match step 11.2 exactly, and re-check <strong>Settings → Pages → Custom domain</strong> is saved and shows the domain as verified.</td></tr>
     <tr><td>HTTPS won't enable</td><td>Wait — GitHub can take a few hours after DNS is correct to issue a certificate. Revisit <strong>Settings → Pages</strong> later.</td></tr>
     <tr><td>Sync workflow can't push new content</td><td>Check <strong>Settings → Actions → General → Workflow permissions</strong> is set to "Read and write permissions".</td></tr>
   </table>
